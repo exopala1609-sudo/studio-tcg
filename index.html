@@ -32,7 +32,7 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
         }
@@ -61,31 +61,63 @@
             flex-wrap: wrap;
         }
 
+        /* 3 colonnes : éditeur gauche | carte | éditeur droit */
         main {
             display: grid;
-            grid-template-columns: 420px 1fr;
+            grid-template-columns: 370px 1fr 370px;
             flex: 1;
-            height: calc(100vh - 73px);
+            min-height: 0;
             overflow: hidden;
+        }
+
+        @media (max-width: 1280px) {
+            main { grid-template-columns: 320px 1fr 320px; }
         }
 
         @media (max-width: 1024px) {
             main {
                 grid-template-columns: 1fr;
-                height: auto;
-                overflow: auto;
+                overflow: visible;
             }
+            body { height: auto; }
+            .editor-panel, .preview-panel { overflow: visible; }
         }
 
-        /* Panneau de configuration */
+        /* Panneaux de configuration */
         .editor-panel {
             background: var(--bg-card);
-            border-right: 1px solid var(--border-color);
-            padding: 1.5rem;
+            padding: 1.25rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 1.25rem;
+        }
+
+        /* Colonnes étroites : les champs rétrécissent au lieu de déborder */
+        .editor-panel .form-row > *,
+        .editor-panel .form-group > input,
+        .editor-panel .form-group > select,
+        .editor-panel .form-group > textarea,
+        .editor-panel .spell-editor > textarea {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .editor-panel .form-group > .btn { white-space: normal; }
+
+        .editor-panel-left { border-right: 1px solid var(--border-color); }
+        .editor-panel-right { border-left: 1px solid var(--border-color); }
+
+        .btn.btn-new-card {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            font-weight: 700;
+        }
+
+        .btn.btn-new-card:hover { background: #15803d; }
+
+        .btn.btn-binder {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            font-weight: 700;
         }
 
         .section-group {
@@ -210,14 +242,143 @@
 
         /* Panneau de prévisualisation & Collection */
         .preview-panel {
-            padding: 2rem;
+            padding: 1.25rem 1.25rem 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
             overflow-y: auto;
-            gap: 2rem;
+            gap: 1rem;
         }
+
+        /* Barre d'actions collée en bas de la zone centrale */
+        .center-actions {
+            position: sticky;
+            bottom: 0;
+            margin: auto -1.25rem 0;
+            align-self: stretch;
+            padding: 0.75rem 1.25rem 1rem;
+            background: linear-gradient(to top, var(--bg-dark) 75%, rgba(15, 23, 42, 0));
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 5;
+        }
+
+        /* Sélecteur de vue */
+        .view-toggle {
+            display: inline-flex;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            padding: 4px;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .view-toggle button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .view-toggle button.active { background: var(--primary); color: #fff; }
+
+        /* Vue 3D interactive (clones d'affichage uniquement) */
+        .preview-3d {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0 1rem;
+        }
+
+        .preview-3d[hidden], .preview-cards[hidden] { display: none; }
+
+        .scene3d {
+            --rx: 0deg;
+            --ry: 0deg;
+            --gx: 50%;
+            --gy: 50%;
+            --glare: 0;
+            width: 375px;
+            height: 523px;
+            perspective: 1100px;
+            cursor: pointer;
+        }
+
+        .tilt3d {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: rotateX(var(--rx)) rotateY(var(--ry));
+            transition: transform 0.12s ease-out;
+        }
+
+        .scene3d.resting .tilt3d { transition: transform 0.5s ease; }
+
+        .flipper3d {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .flipper3d.flipped { transform: rotateY(180deg); }
+
+        .face3d {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .face3d-back { transform: rotateY(180deg); }
+
+        .face3d .tcg-card { position: absolute; top: 0; left: 0; }
+
+        /* Reflet qui suit le curseur + irisation holographique (plus forte selon la rareté) */
+        .glare3d {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 10;
+            opacity: var(--glare);
+            transition: opacity 0.3s ease;
+            mix-blend-mode: overlay;
+            background:
+                radial-gradient(circle at var(--gx) var(--gy), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 45%);
+        }
+
+        .holo3d {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 9;
+            opacity: calc(var(--glare) * var(--holo, 0.25));
+            transition: opacity 0.3s ease;
+            mix-blend-mode: color-dodge;
+            background: linear-gradient(115deg,
+                transparent 20%, #ff0080 32%, #ffd700 42%, #00ffc8 52%, #0080ff 62%, #c800ff 72%, transparent 84%);
+            background-size: 250% 250%;
+            background-position: var(--gx) var(--gy);
+        }
+
+        .rarity-common .holo3d { --holo: 0.06; }
+        .rarity-uncommon .holo3d { --holo: 0.1; }
+        .rarity-rare .holo3d { --holo: 0.16; }
+        .rarity-epic .holo3d { --holo: 0.26; }
+        .rarity-legendary .holo3d { --holo: 0.45; }
+        .card-back .holo3d { --holo: 0.15; }
 
         .preview-container {
             display: flex;
@@ -901,25 +1062,70 @@
             min-height: 1em;
         }
 
-        /* Section Collection / Deck */
-        .collection-section {
-            width: 100%;
-            max-width: 900px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+        /* Classeur de collection (plein écran) */
+        .binder-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            background: rgba(2, 6, 23, 0.85);
+            display: flex;
             padding: 1.5rem;
+        }
+
+        .binder-overlay[hidden] { display: none; }
+
+        .binder {
+            flex: 1;
+            min-width: 0;
+            background:
+                radial-gradient(circle at 20% 0%, rgba(124, 58, 237, 0.15), transparent 50%),
+                var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
         }
 
-        .collection-header {
+        .binder-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 0.75rem;
             flex-wrap: wrap;
+        }
+
+        .owner-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .owner-tabs button {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 999px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .owner-tabs button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .owner-tabs .tab-count {
+            margin-left: 0.35rem;
+            padding: 0 0.45rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.15);
+            font-size: 0.75rem;
         }
 
         .collection-filters {
@@ -934,45 +1140,68 @@
         }
 
         .collection-grid {
+            flex: 1;
+            min-height: 0;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-            gap: 1rem;
-            max-height: 460px;
+            grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+            gap: 1.25rem;
+            align-content: start;
+            align-items: start;
             overflow-y: auto;
-            padding: 0.5rem;
+            padding: 0.75rem 0.5rem 1.5rem;
+            perspective: 900px;
         }
 
         .collection-item {
+            position: relative;
             background: var(--bg-dark);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 0.5rem;
+            border-radius: 10px;
+            padding: 0.6rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 0.5rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s;
         }
 
         .collection-item:hover {
             border-color: var(--primary);
-            transform: translateY(-2px);
+            transform: rotateX(4deg) rotateY(-6deg) scale(1.06);
+            box-shadow: 12px 18px 30px rgba(0, 0, 0, 0.5);
+            z-index: 2;
         }
+
+        .collection-item.is-mine { border-color: rgba(34, 197, 94, 0.45); }
+
+        /* Badge propriétaire en coin de miniature */
+        .owner-badge {
+            position: absolute;
+            top: -8px;
+            right: -6px;
+            z-index: 3;
+            padding: 0.15rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+            max-width: 75%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .owner-badge.mine { background: #16a34a; color: #fff; }
+        .owner-badge.friend { background: #f59e0b; color: #1c1917; }
 
         .collection-item.active {
             border-color: var(--primary);
             box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.4);
         }
 
-        .collection-owner {
-            width: 100%;
-            font-size: 0.72rem;
-            color: #a5b4fc;
-            margin-top: -0.3rem;
-        }
-
-        #migrateBtn[hidden], #collectionOwnerFilter[hidden] { display: none; }
+        #migrateBtn[hidden] { display: none; }
+        #migrateBtn { align-self: flex-start; }
 
         .collection-title {
             width: 100%;
@@ -1150,6 +1379,7 @@
             <button class="btn btn-secondary btn-small" onclick="signOut()">Déconnexion</button>
         </span>
         <div class="header-actions">
+            <button class="btn btn-binder" onclick="openBinder()">📚 Collection (<span id="headerCollectionCount">0</span> cartes)</button>
             <button class="btn btn-secondary" onclick="document.getElementById('importSingleInput').click()">📥 Importer une carte</button>
             <input type="file" id="importSingleInput" accept=".json" onchange="importSingleCard(event)">
             <button class="btn btn-secondary" onclick="document.getElementById('importDeckInput').click()">📂 Importer un deck</button>
@@ -1161,8 +1391,10 @@
     </header>
 
     <main>
-        <!-- PANNEAU ÉDITEUR -->
-        <div class="editor-panel">
+        <!-- PANNEAU ÉDITEUR GAUCHE : illustration, informations, verso -->
+        <div class="editor-panel editor-panel-left">
+            <button class="btn btn-new-card" onclick="resetToNewCard()">➕ Nouvelle carte</button>
+
             <!-- Illustration -->
             <div class="section-group">
                 <h3>Illustration & Style</h3>
@@ -1197,7 +1429,7 @@
                     <input type="range" id="artHeightRange" min="120" max="330" step="5" value="120" oninput="updateCard()">
                 </div>
                 <p class="hint" id="textOverflowHint" style="display:none; color:#fbbf24;">⚠️ Le texte de la carte est coupé : réduisez la hauteur de la zone image.</p>
-                <p class="hint">Astuce : glissez l'image directement sur la carte pour la déplacer, molette pour zoomer.</p>
+                <p class="hint">Astuce : en vue « Côte à côte », glissez l'image directement sur la carte pour la déplacer, molette pour zoomer.</p>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Rareté (bordure)</label>
@@ -1241,7 +1473,7 @@
                 <div class="form-row">
                     <div class="form-group" style="flex: 2;">
                         <label>Nom de la carte</label>
-                        <input type="text" id="cardNameInput" value="Dragon Ancien" oninput="updateCard()">
+                        <input type="text" id="cardNameInput" value="" placeholder="Dragon Ancien" oninput="updateCard()">
                     </div>
                     <div class="form-group" style="flex: 1;">
                         <label>Coût Mana</label>
@@ -1273,7 +1505,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Sous-type</label>
-                        <input type="text" id="cardSubtypeInput" value="Dragon" oninput="updateCard()">
+                        <input type="text" id="cardSubtypeInput" value="" placeholder="Dragon" oninput="updateCard()">
                     </div>
                     <div class="form-group">
                         <label>Police du nom</label>
@@ -1290,73 +1522,6 @@
                 </div>
             </div>
 
-            <!-- Stats & Capacités -->
-            <div class="section-group">
-                <h3>Capacités & Stats</h3>
-                <div class="form-group">
-                    <label>❤️ Points de Vie (PV) — vide = non affiché</label>
-                    <input type="text" id="cardHpInput" value="120" oninput="updateCard()">
-                </div>
-                <div class="form-group">
-                    <label>Capacité passive (optionnel)</label>
-                    <textarea id="cardAbilityInput" style="min-height: 45px;" oninput="updateCard()">Vol, Piétinement.</textarea>
-                </div>
-                <h4 class="sub-title" id="spellsTitle">Sorts (2 maximum)</h4>
-                <div class="spell-editor">
-                    <div class="form-row spell-row">
-                        <div class="form-group">
-                            <label class="spell-label">Sort 1 — Nom</label>
-                            <input type="text" id="spell1Name" value="Souffle ardent" oninput="updateCard()">
-                        </div>
-                        <div class="form-group dmg-group">
-                            <label>Dégâts</label>
-                            <input type="text" id="spell1Dmg" value="60" oninput="updateCard()">
-                        </div>
-                    </div>
-                    <textarea id="spell1Text" placeholder="Description (optionnel)" oninput="updateCard()">Inflige 20 dégâts supplémentaires si la cible est un Héros.</textarea>
-                </div>
-                <div class="spell-editor">
-                    <div class="form-row spell-row">
-                        <div class="form-group">
-                            <label class="spell-label">Sort 2 — Nom</label>
-                            <input type="text" id="spell2Name" value="Coup de queue" oninput="updateCard()">
-                        </div>
-                        <div class="form-group dmg-group">
-                            <label>Dégâts</label>
-                            <input type="text" id="spell2Dmg" value="30" oninput="updateCard()">
-                        </div>
-                    </div>
-                    <textarea id="spell2Text" placeholder="Description (optionnel)" oninput="updateCard()"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Description / Lore</label>
-                    <textarea id="cardFlavorInput" style="min-height: 45px;" oninput="updateCard()">Il régna sur les pics incandescents durant des millénaires.</textarea>
-                </div>
-            </div>
-
-            <!-- Set & Artiste -->
-            <div class="section-group">
-                <h3>Set & Illustrateur</h3>
-                <div class="form-group">
-                    <label>Nom du set</label>
-                    <input type="text" id="cardSetNameInput" value="Édition de base" oninput="updateCard()">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>N° de Carte</label>
-                        <input type="text" id="cardNumInput" value="001" oninput="updateCard()">
-                    </div>
-                    <div class="form-group">
-                        <label>Total Set</label>
-                        <input type="text" id="cardTotalSetInput" value="050" oninput="updateCard()">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Nom de l'Artiste</label>
-                    <input type="text" id="cardArtistInput" value="Studio TCG" oninput="updateCard()">
-                </div>
-            </div>
-
             <!-- Verso -->
             <div class="section-group">
                 <h3>Verso (commun à toutes les cartes)</h3>
@@ -1364,24 +1529,20 @@
                 <input type="file" id="backImageInput" accept="image/*" onchange="handleBackUpload(event)">
                 <div class="form-row">
                     <button class="btn btn-secondary btn-small" onclick="resetBack()">↺ Verso de base</button>
-                    <button class="btn btn-secondary btn-small" onclick="downloadElementImage(document.getElementById('backCard'), 'verso_tcgbp')">📥 Verso PNG HD</button>
+                    <button class="btn btn-secondary btn-small" onclick="downloadBackImage()">📥 Verso PNG HD</button>
                 </div>
-            </div>
-
-            <!-- Actions Sauvegarde -->
-            <div class="editing-badge" id="editingBadge"></div>
-            <div class="action-bar">
-                <button class="btn btn-secondary" id="updateCardBtn" onclick="updateCurrentCard()" disabled>💾 Mettre à jour</button>
-                <button class="btn btn-secondary" onclick="saveAsNewCard()">➕ Ajouter à la collection</button>
-                <button class="btn btn-secondary" onclick="exportSingleCardJSON()">📤 Exporter la carte</button>
-                <button class="btn" onclick="downloadCardImage()">📥 Télécharger PNG HD</button>
             </div>
         </div>
 
-        <!-- PANNEAU PRÉVISUALISATION ET COLLECTION -->
+        <!-- ZONE CENTRALE : aperçu + actions toujours accessibles -->
         <div class="preview-panel">
+            <div class="view-toggle" role="tablist">
+                <button type="button" id="viewEditBtn" class="active" onclick="setPreviewMode('edit')">👁️ Côte à côte (Édition)</button>
+                <button type="button" id="view3dBtn" onclick="setPreviewMode('3d')">✨ Vue 3D Interactive (Flip &amp; Holo)</button>
+            </div>
+
             <div class="preview-container">
-              <div class="preview-cards">
+              <div class="preview-cards" id="previewEdit">
                 <div class="preview-side">
                 <span class="preview-caption">Recto</span>
                 <!-- CARTE TCG RENDUE (sert aussi de modèle pour les mini-cartes) -->
@@ -1434,32 +1595,130 @@
                     </div>
                 </div>
               </div>
-            </div>
 
-            <!-- GESTIONNAIRE DE COLLECTION -->
-            <div class="collection-section">
-                <div class="collection-header">
-                    <h3>📚 Collection de Cartes (<span id="collectionCount">0</span>)</h3>
-                    <div class="collection-filters">
-                        <input type="search" id="collectionSearch" placeholder="🔍 Rechercher…" oninput="renderCollection()">
-                        <select id="collectionOwnerFilter" onchange="renderCollection()" hidden></select>
-                        <select id="collectionTypeFilter" onchange="renderCollection()">
-                            <option value="">Tous les types</option>
-                            <option value="hero">Héros</option>
-                            <option value="spell">Sort</option>
-                            <option value="artifact">Artefact</option>
-                            <option value="land">Terrain</option>
-                        </select>
-                        <button class="btn btn-secondary btn-small" onclick="clearCollection()">Vider</button>
+              <!-- Vue 3D : clones de la carte, jamais utilisés pour les exports -->
+              <div class="preview-3d" id="preview3d" hidden>
+                <div class="scene3d" id="scene3d" onclick="flip3d()" title="Cliquer pour retourner la carte">
+                    <div class="tilt3d" id="tilt3d">
+                        <div class="flipper3d" id="flipper3d">
+                            <div class="face3d face3d-front" id="face3dFront"></div>
+                            <div class="face3d face3d-back" id="face3dBack"></div>
+                        </div>
                     </div>
                 </div>
-                <button class="btn btn-success btn-small" id="migrateBtn" onclick="migrateLocalCards()" hidden></button>
-                <div class="collection-grid" id="collectionGrid">
-                    <!-- Les cartes enregistrées apparaîtront ici -->
+                <button type="button" class="btn btn-secondary btn-small" onclick="flip3d()">🔄 Retourner la carte (180°)</button>
+              </div>
+            </div>
+
+            <!-- Actions : collées en bas de la zone centrale, accessibles sans défiler -->
+            <div class="center-actions">
+                <div class="editing-badge" id="editingBadge"></div>
+                <div class="action-bar">
+                    <button class="btn btn-new-card" onclick="resetToNewCard()">➕ Nouvelle carte</button>
+                    <button class="btn btn-secondary" id="updateCardBtn" onclick="updateCurrentCard()" disabled>💾 Mettre à jour</button>
+                    <button class="btn btn-secondary" onclick="saveAsNewCard()">📥 Ajouter à la collection</button>
+                    <button class="btn btn-secondary" onclick="exportSingleCardJSON()">📤 Exporter la carte</button>
+                    <button class="btn" onclick="downloadCardImage()">🖼️ PNG HD</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANNEAU ÉDITEUR DROIT : capacités, set -->
+        <div class="editor-panel editor-panel-right">
+            <!-- Stats & Capacités -->
+            <div class="section-group">
+                <h3>Capacités & Stats</h3>
+                <div class="form-group">
+                    <label>❤️ Points de Vie (PV) — vide = non affiché</label>
+                    <input type="text" id="cardHpInput" value="" placeholder="120" oninput="updateCard()">
+                </div>
+                <div class="form-group">
+                    <label>Capacité passive (optionnel)</label>
+                    <textarea id="cardAbilityInput" style="min-height: 45px;" placeholder="Vol, Piétinement." oninput="updateCard()"></textarea>
+                </div>
+                <h4 class="sub-title" id="spellsTitle">Sorts (2 maximum)</h4>
+                <div class="spell-editor">
+                    <div class="form-row spell-row">
+                        <div class="form-group">
+                            <label class="spell-label">Sort 1 — Nom</label>
+                            <input type="text" id="spell1Name" value="" placeholder="Souffle ardent" oninput="updateCard()">
+                        </div>
+                        <div class="form-group dmg-group">
+                            <label>Dégâts</label>
+                            <input type="text" id="spell1Dmg" value="" placeholder="60" oninput="updateCard()">
+                        </div>
+                    </div>
+                    <textarea id="spell1Text" placeholder="Inflige 20 dégâts supplémentaires si la cible est un Héros." oninput="updateCard()"></textarea>
+                </div>
+                <div class="spell-editor">
+                    <div class="form-row spell-row">
+                        <div class="form-group">
+                            <label class="spell-label">Sort 2 — Nom</label>
+                            <input type="text" id="spell2Name" value="" placeholder="Coup de queue" oninput="updateCard()">
+                        </div>
+                        <div class="form-group dmg-group">
+                            <label>Dégâts</label>
+                            <input type="text" id="spell2Dmg" value="" placeholder="30" oninput="updateCard()">
+                        </div>
+                    </div>
+                    <textarea id="spell2Text" placeholder="Description (optionnel)" oninput="updateCard()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Description / Lore</label>
+                    <textarea id="cardFlavorInput" style="min-height: 45px;" placeholder="Il régna sur les pics incandescents durant des millénaires." oninput="updateCard()"></textarea>
+                </div>
+            </div>
+
+            <!-- Set & Artiste -->
+            <div class="section-group">
+                <h3>Set & Illustrateur</h3>
+                <div class="form-group">
+                    <label>Nom du set</label>
+                    <input type="text" id="cardSetNameInput" value="" placeholder="Édition de base" oninput="updateCard()">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>N° de Carte</label>
+                        <input type="text" id="cardNumInput" value="001" oninput="updateCard()">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Set</label>
+                        <input type="text" id="cardTotalSetInput" value="050" oninput="updateCard()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nom de l'Artiste</label>
+                    <input type="text" id="cardArtistInput" value="" placeholder="Studio TCG" oninput="updateCard()">
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- CLASSEUR DE COLLECTION (plein écran) -->
+    <div class="binder-overlay" id="binderOverlay" hidden onclick="if (event.target === this) closeBinder()">
+        <div class="binder">
+            <div class="binder-header">
+                <h2>📚 Classeur de collection (<span id="collectionCount">0</span>)</h2>
+                <div class="collection-filters">
+                    <input type="search" id="collectionSearch" placeholder="🔍 Rechercher…" oninput="renderCollection()">
+                    <select id="collectionTypeFilter" onchange="renderCollection()">
+                        <option value="">Tous les types</option>
+                        <option value="hero">Héros</option>
+                        <option value="spell">Sort</option>
+                        <option value="artifact">Artefact</option>
+                        <option value="land">Terrain</option>
+                    </select>
+                    <button class="btn btn-secondary btn-small" onclick="clearCollection()">Vider</button>
+                    <button class="btn btn-small" onclick="closeBinder()">✕ Fermer</button>
+                </div>
+            </div>
+            <div class="owner-tabs" id="collectionOwnerTabs"></div>
+            <button class="btn btn-success btn-small" id="migrateBtn" onclick="migrateLocalCards()" hidden></button>
+            <div class="collection-grid" id="collectionGrid">
+                <!-- Les cartes enregistrées apparaîtront ici -->
+            </div>
+        </div>
+    </div>
 
     <!-- ÉCRAN DE CONNEXION -->
     <div class="auth-overlay" id="authOverlay" hidden>
@@ -1691,6 +1950,7 @@
             try { backImageSrc = localStorage.getItem('tcg_back') || ''; } catch (e) { backImageSrc = ''; }
             applyBack();
             initArtInteractions();
+            init3dTilt();
             updateCard();
             checkSupabaseConnection().then(initAuth);
         });
@@ -1755,8 +2015,31 @@
             return 'card_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
         }
 
-        function readForm() {
-            const v = id => document.getElementById(id).value;
+        // Carte d'exemple : affichée (et en placeholder) tant que le formulaire d'une nouvelle carte est vierge
+        const DEMO_TEXT = {
+            cardNameInput: 'Dragon Ancien',
+            cardSubtypeInput: 'Dragon',
+            cardHpInput: '120',
+            cardAbilityInput: 'Vol, Piétinement.',
+            spell1Name: 'Souffle ardent',
+            spell1Dmg: '60',
+            spell1Text: 'Inflige 20 dégâts supplémentaires si la cible est un Héros.',
+            spell2Name: 'Coup de queue',
+            spell2Dmg: '30',
+            cardFlavorInput: 'Il régna sur les pics incandescents durant des millénaires.',
+            cardSetNameInput: 'Édition de base',
+            cardArtistInput: 'Studio TCG'
+        };
+        const TEXT_FIELDS = [...Object.keys(DEMO_TEXT), 'spell2Text'];
+
+        function isFormBlank() {
+            return TEXT_FIELDS.every(id => !document.getElementById(id).value.trim());
+        }
+
+        // preview: true = valeurs d'exemple si rien n'est saisi (affichage uniquement, jamais enregistrées)
+        function readForm({ preview = false } = {}) {
+            const demo = preview && !currentCardId && isFormBlank();
+            const v = id => (demo && id in DEMO_TEXT) ? DEMO_TEXT[id] : document.getElementById(id).value;
             return {
                 name: v('cardNameInput'),
                 mana: v('cardManaInput'),
@@ -1900,8 +2183,9 @@
         }
 
         function updateCard() {
-            const d = readForm();
+            const d = readForm({ preview: true });
             applyCardData(document.getElementById('renderCard'), d);
+            schedule3d();
 
             document.getElementById('zoomVal').textContent = d.zoom;
             document.getElementById('offsetXVal').textContent = d.offsetX;
@@ -1920,6 +2204,70 @@
         // ---------- Verso ----------
         function applyBack() {
             document.querySelector('#backCard .card-back-img').style.backgroundImage = `url("${backImageSrc || DEFAULT_BACK}")`;
+            schedule3d();
+        }
+
+        // ---------- Vue 3D interactive (inclinaison, reflet holo, retournement) ----------
+        // Elle n'affiche que des clones : les exports (html2canvas) partent toujours de clones
+        // neufs rendus hors écran, jamais de ces éléments transformés en 3D.
+        let previewMode = 'edit';
+        let render3dFrame = null;
+
+        function setPreviewMode(mode) {
+            previewMode = mode;
+            document.getElementById('viewEditBtn').classList.toggle('active', mode === 'edit');
+            document.getElementById('view3dBtn').classList.toggle('active', mode === '3d');
+            document.getElementById('previewEdit').hidden = mode === '3d';
+            document.getElementById('preview3d').hidden = mode !== '3d';
+            if (mode === '3d') rebuild3d();
+            else updateCard();
+        }
+
+        function schedule3d() {
+            if (previewMode !== '3d') return;
+            cancelAnimationFrame(render3dFrame);
+            render3dFrame = requestAnimationFrame(rebuild3d);
+        }
+
+        function withShine(cardEl) {
+            const holo = document.createElement('div');
+            holo.className = 'holo3d';
+            const glare = document.createElement('div');
+            glare.className = 'glare3d';
+            cardEl.append(holo, glare);
+            return cardEl;
+        }
+
+        function rebuild3d() {
+            if (previewMode !== '3d') return;
+            document.getElementById('face3dFront').replaceChildren(withShine(makeCardClone(readForm({ preview: true }))));
+            document.getElementById('face3dBack').replaceChildren(withShine(makeBackClone()));
+        }
+
+        function flip3d() {
+            document.getElementById('flipper3d').classList.toggle('flipped');
+        }
+
+        function init3dTilt() {
+            const scene = document.getElementById('scene3d');
+            const MAX_TILT = 15;
+            scene.addEventListener('pointermove', e => {
+                const r = scene.getBoundingClientRect();
+                const px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+                const py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+                scene.classList.remove('resting');
+                scene.style.setProperty('--ry', `${(px - 0.5) * 2 * MAX_TILT}deg`);
+                scene.style.setProperty('--rx', `${(0.5 - py) * 2 * MAX_TILT}deg`);
+                scene.style.setProperty('--gx', `${px * 100}%`);
+                scene.style.setProperty('--gy', `${py * 100}%`);
+                scene.style.setProperty('--glare', 1);
+            });
+            scene.addEventListener('pointerleave', () => {
+                scene.classList.add('resting');
+                scene.style.setProperty('--rx', '0deg');
+                scene.style.setProperty('--ry', '0deg');
+                scene.style.setProperty('--glare', 0);
+            });
         }
 
         function handleBackUpload(event) {
@@ -2047,6 +2395,7 @@
 
         // Zoom "contain" : toute l'image visible dans la fenêtre (hauteur entière pour une photo verticale)
         async function fitWholeImage() {
+            if (previewMode !== 'edit') setPreviewMode('edit');   // la mesure se fait sur la carte d'édition
             await getImageRatio(currentImageSrc || DEFAULT_ART);
             updateCard();
             const container = document.querySelector('#renderCard .card-art-container');
@@ -2137,9 +2486,44 @@
         function setCurrentCard(id) {
             currentCardId = id && collection.some(c => c.id === id) ? id : null;
             const current = collection.find(c => c.id === currentCardId);
-            document.getElementById('updateCardBtn').disabled = !current;
-            document.getElementById('editingBadge').textContent = current ? `✏️ Édition de « ${current.name || 'Sans nom'} »` : '';
+            // Carte d'un ami : lecture seule, l'enregistrement crée une copie à mon nom
+            const locked = !!current && !isOwnCard(current);
+            const btn = document.getElementById('updateCardBtn');
+            btn.disabled = !current;
+            btn.textContent = locked ? '📑 Dupliquer à mon nom' : '💾 Mettre à jour';
+            document.getElementById('editingBadge').textContent = !current ? ''
+                : locked ? `🔒 Carte de « ${current.ownerName || 'un ami'} » (lecture seule — enregistrer créera une copie à votre nom)`
+                : `✏️ Édition de « ${current.name || 'Sans nom'} »`;
             renderCollection();
+        }
+
+        // Le formulaire diffère-t-il de la carte chargée (ou, pour une nouvelle carte, contient-il quelque chose) ?
+        function hasUnsavedChanges() {
+            const current = collection.find(c => c.id === currentCardId);
+            if (!current) return !isFormBlank() || !!currentImageSrc;
+            const form = normalizeCard({ ...readForm(), id: current.id, ownerId: current.ownerId, ownerName: current.ownerName });
+            return stableStringify(form) !== stableStringify(normalizeCard(current));
+        }
+
+        function resetToNewCard() {
+            if (hasUnsavedChanges() && !confirm('Abandonner les modifications non enregistrées de la carte en cours ?')) return;
+            const set = (id, val) => document.getElementById(id).value = val;
+            TEXT_FIELDS.forEach(id => set(id, ''));
+            set('cardManaInput', 5);
+            set('manaColorInput', 'light');
+            set('cardTypeInput', 'hero');
+            set('rarityInput', 'rare');
+            set('elementInput', 'neutral');
+            set('titleFontInput', 'Merienda');
+            document.getElementById('fullArtCheck').checked = false;
+            set('zoomRange', 100);
+            set('offsetXRange', 0);
+            set('offsetYRange', 0);
+            set('artHeightRange', ART_HEIGHT_AUTO);
+            currentImageSrc = '';
+            setCurrentCard(null);
+            updateCard();
+            document.getElementById('cardNameInput').focus();
         }
 
         // ---------- Collection : table Supabase "cards" (connecté) ou navigateur (hors ligne) ----------
@@ -2319,6 +2703,8 @@
         async function updateCurrentCard() {
             const idx = collection.findIndex(c => c.id === currentCardId);
             if (idx === -1) return;
+            // Jamais d'écrasement de la carte d'un ami : on en fait une copie à mon nom
+            if (!isOwnCard(collection[idx])) return saveAsNewCard();
             if (!isCloudActive()) {
                 collection[idx] = { ...readForm(), id: currentCardId };
                 saveCollectionToStorage();
@@ -2447,67 +2833,111 @@
             }
         }
 
-        function renderOwnerFilter() {
-            const select = document.getElementById('collectionOwnerFilter');
-            select.hidden = !isCloudActive();
-            if (select.hidden) return;
-            const previous = select.value;
-            const owners = new Map();
-            collection.forEach(c => { if (c.ownerId && c.ownerId !== currentUser.id) owners.set(c.ownerId, c.ownerName || 'Anonyme'); });
-            select.innerHTML = '<option value="">Toutes les collections</option><option value="mine">Mes cartes</option>';
-            owners.forEach((name, ownerId) => {
-                const opt = document.createElement('option');
-                opt.value = ownerId;
-                opt.textContent = `Collection de ${name}`;
-                select.appendChild(opt);
-            });
-            select.value = [...select.options].some(o => o.value === previous) ? previous : '';
+        // ---------- Classeur de collection (plein écran) ----------
+        let ownerTab = '';   // '' = toutes, 'mine' = mes cartes, sinon id du joueur
+
+        function isBinderOpen() {
+            return !document.getElementById('binderOverlay').hidden;
+        }
+
+        function openBinder() {
+            document.getElementById('binderOverlay').hidden = false;
+            renderCollection();
+            document.getElementById('collectionSearch').focus();
+        }
+
+        function closeBinder() {
+            document.getElementById('binderOverlay').hidden = true;
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && isBinderOpen()) closeBinder();
+        });
+
+        function setOwnerTab(tab) {
+            ownerTab = tab;
+            renderCollection();
+        }
+
+        // Onglets "Toutes", "Mes cartes" et un par joueur, avec compteurs
+        function renderOwnerTabs() {
+            const tabs = [{ key: '', label: 'Toutes', count: collection.length }];
+            if (isCloudActive()) {
+                tabs.push({ key: 'mine', label: '★ Mes cartes', count: collection.filter(isOwnCard).length });
+                const owners = new Map();
+                collection.forEach(c => {
+                    if (isOwnCard(c)) return;
+                    const o = owners.get(c.ownerId) || { label: `👤 ${c.ownerName || 'Anonyme'}`, count: 0 };
+                    o.count++;
+                    owners.set(c.ownerId, o);
+                });
+                owners.forEach((o, key) => tabs.push({ key, ...o }));
+            }
+            if (!tabs.some(t => t.key === ownerTab)) ownerTab = '';
+
+            const container = document.getElementById('collectionOwnerTabs');
+            container.replaceChildren(...tabs.map(t => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = t.key === ownerTab ? 'active' : '';
+                b.textContent = t.label;
+                const count = document.createElement('span');
+                count.className = 'tab-count';
+                count.textContent = t.count;
+                b.appendChild(count);
+                b.onclick = () => setOwnerTab(t.key);
+                return b;
+            }));
         }
 
         function renderCollection() {
+            document.getElementById('collectionCount').textContent = collection.length;
+            document.getElementById('headerCollectionCount').textContent = collection.length;
+            if (!isBinderOpen()) return;   // les miniatures ne sont dessinées que classeur ouvert
+
             const grid = document.getElementById('collectionGrid');
             const search = document.getElementById('collectionSearch').value.trim().toLowerCase();
             const typeFilter = document.getElementById('collectionTypeFilter').value;
-            renderOwnerFilter();
-            const ownerFilter = isCloudActive() ? document.getElementById('collectionOwnerFilter').value : '';
-            document.getElementById('collectionCount').textContent = collection.length;
+            renderOwnerTabs();
             grid.innerHTML = '';
 
             const visible = collection.filter(c =>
                 (!typeFilter || c.type === typeFilter) &&
-                (!ownerFilter || (ownerFilter === 'mine' ? isOwnCard(c) : c.ownerId === ownerFilter)) &&
+                (!ownerTab || (ownerTab === 'mine' ? isOwnCard(c) : c.ownerId === ownerTab)) &&
                 (!search || `${c.name} ${c.subtype} ${c.ability} ${c.setName || ''} ${c.ownerName || ''}`.toLowerCase().includes(search))
             );
 
             if (visible.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 1.5rem; font-size: 0.85rem;">${collection.length ? 'Aucune carte ne correspond au filtre.' : 'Aucune carte enregistrée. Cliquez sur "Ajouter à la collection".'}</div>`;
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 1.5rem; font-size: 0.85rem;">${collection.length ? 'Aucune carte ne correspond au filtre.' : 'Aucune carte enregistrée. Créez une carte puis cliquez sur « Ajouter à la collection ».'}</div>`;
                 return;
             }
 
             visible.forEach(card => {
+                const mine = isOwnCard(card);
                 const item = document.createElement('div');
-                item.className = 'collection-item' + (card.id === currentCardId ? ' active' : '');
-                item.onclick = () => loadCardIntoForm(card);
-                item.appendChild(makeMiniCard(card, 0.37));
+                item.className = 'collection-item' + (card.id === currentCardId ? ' active' : '') + (isCloudActive() && mine ? ' is-mine' : '');
+                item.onclick = () => { loadCardIntoForm(card); closeBinder(); };
+
+                if (isCloudActive()) {
+                    const badge = document.createElement('span');
+                    badge.className = 'owner-badge ' + (mine ? 'mine' : 'friend');
+                    badge.textContent = mine ? '★ Moi' : `👤 ${card.ownerName || 'Anonyme'}`;
+                    item.appendChild(badge);
+                }
+
+                item.appendChild(makeMiniCard(card, 0.45));
 
                 const title = document.createElement('div');
                 title.className = 'collection-title';
                 title.textContent = card.name || 'Sans nom';
                 item.appendChild(title);
 
-                if (isCloudActive()) {
-                    const owner = document.createElement('div');
-                    owner.className = 'collection-owner';
-                    owner.textContent = isOwnCard(card) ? 'par vous' : `par ${card.ownerName || 'Anonyme'}`;
-                    item.appendChild(owner);
-                }
-
                 const actions = document.createElement('div');
                 actions.className = 'collection-item-actions';
                 const typeLabel = document.createElement('span');
                 typeLabel.textContent = `${TYPES[card.type] || card.type} · ${RARITIES[card.rarity] || ''}`;
                 actions.appendChild(typeLabel);
-                if (isOwnCard(card)) {
+                if (mine) {
                     const del = document.createElement('button');
                     del.className = 'delete-card-btn';
                     del.textContent = 'Supprimer';
@@ -2613,17 +3043,25 @@
         }
 
         // ---------- Export Image HD de la carte courante ----------
-        function downloadCardImage() {
-            downloadElementImage(document.getElementById('renderCard'), document.getElementById('cardNameInput').value || 'carte_tcg');
+        // Les PNG partent toujours d'un clone neuf rendu hors écran : ni la vue 3D,
+        // ni le défilement de la page ne peuvent déformer l'export
+        async function downloadCardImage() {
+            const d = readForm({ preview: true });
+            await getImageRatio(d.imageSrc || DEFAULT_ART);
+            await downloadClone(makeCardClone(d), d.name || 'carte_tcg');
         }
 
-        function downloadElementImage(element, name) {
-            document.fonts.ready.then(() => html2canvas(element, { scale: 3, useCORS: true, backgroundColor: null })).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${name}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
+        function downloadBackImage() {
+            return downloadClone(makeBackClone(), 'verso_tcgbp');
+        }
+
+        async function downloadClone(clone, name) {
+            await document.fonts.ready;
+            const canvas = await renderOffscreen(clone, 3, null);
+            const link = document.createElement('a');
+            link.download = `${name}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         }
 
         // ---------- Export Tabletop Simulator (ZIP) ----------
@@ -2641,7 +3079,7 @@
         }
 
         // Rend un élément hors écran (il doit être dans le DOM pour html2canvas)
-        async function renderOffscreen(el, scale) {
+        async function renderOffscreen(el, scale, backgroundColor = '#111111') {
             const host = document.createElement('div');
             host.style.cssText = 'position:fixed;left:-20000px;top:0;';
             el.style.boxShadow = 'none';
@@ -2649,7 +3087,7 @@
             document.body.appendChild(host);
             try {
                 await waitForImages(el);
-                return await html2canvas(el, { scale, useCORS: true, backgroundColor: '#111111' });
+                return await html2canvas(el, { scale, useCORS: true, backgroundColor });
             } finally {
                 host.remove();
             }
@@ -2662,7 +3100,7 @@
                 alert("La librairie ZIP n'a pas pu être chargée (connexion internet nécessaire).");
                 return;
             }
-            const cards = collection.length ? collection : [readForm()];
+            const cards = collection.length ? collection : [readForm({ preview: true })];
             const btn = document.getElementById('ttsExportBtn');
             const label = btn.textContent;
             btn.disabled = true;
@@ -2738,7 +3176,7 @@
 
         // ---------- Galerie des bordures ----------
         function openBorderGallery() {
-            const base = readForm();
+            const base = readForm({ preview: true });
             const grid = document.getElementById('galleryGrid');
             grid.innerHTML = '<div></div>';
 
@@ -2785,7 +3223,7 @@
             container.innerHTML = '';
 
             // On imprime la collection (ou la carte active si collection vide), 9 cartes par page
-            const cardsToPrint = collection.length ? collection : [readForm()];
+            const cardsToPrint = collection.length ? collection : [readForm({ preview: true })];
             for (let i = 0; i < cardsToPrint.length; i += 9) {
                 const page = cardsToPrint.slice(i, i + 9);
                 const sheet = document.createElement('div');
