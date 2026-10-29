@@ -1867,6 +1867,366 @@
             .arena-sidebar.open { transform: none; }
         }
 
+        /* =================== QUOI DE NEUF (ouverture de booster) =================== */
+        .btn.btn-whatsnew {
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.45);
+            color: #fcd34d;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .btn.btn-whatsnew:hover { background: rgba(251, 191, 36, 0.25); }
+
+        .wn-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow: hidden;
+            background: rgba(2, 6, 23, 0.72);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: wn-fade-in 0.35s ease;
+        }
+
+        .wn-overlay.closing { animation: wn-fade-out 0.3s ease forwards; }
+
+        @keyframes wn-fade-in { from { opacity: 0; } }
+        @keyframes wn-fade-out { to { opacity: 0; } }
+
+        /* Halo doré rayonné qui tourne lentement */
+        .wn-rays {
+            position: absolute;
+            width: 160vmax;
+            height: 160vmax;
+            left: 50%;
+            top: 50%;
+            margin: -80vmax 0 0 -80vmax;
+            background:
+                radial-gradient(circle, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.08) 25%, transparent 50%),
+                repeating-conic-gradient(from 0deg, rgba(251, 191, 36, 0.13) 0deg 7deg, transparent 7deg 18deg);
+            mask-image: radial-gradient(circle, #000 15%, transparent 55%);
+            -webkit-mask-image: radial-gradient(circle, #000 15%, transparent 55%);
+            animation: wn-rays-spin 40s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes wn-rays-spin { to { transform: rotate(360deg); } }
+
+        /* Bulles de bière qui montent */
+        .wn-bubbles { position: absolute; inset: 0; pointer-events: none; }
+        .wn-bubbles span {
+            position: absolute;
+            bottom: -30px;
+            left: var(--x);
+            width: var(--s);
+            height: var(--s);
+            border-radius: 50%;
+            border: 1.5px solid rgba(253, 230, 138, 0.55);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), rgba(251, 191, 36, 0.12) 60%, transparent);
+            animation: wn-bubble var(--d) linear var(--delay) infinite;
+        }
+
+        @keyframes wn-bubble {
+            0% { transform: translate(0, 0); opacity: 0; }
+            10% { opacity: 1; }
+            50% { transform: translate(14px, -55vh); }
+            100% { transform: translate(-10px, -110vh); opacity: 0; }
+        }
+
+        .wn-skip {
+            position: absolute;
+            top: max(1rem, env(safe-area-inset-top));
+            right: 1rem;
+            z-index: 3;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
+            border-radius: 999px;
+            padding: 0.4rem 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .wn-skip:hover { color: #fff; }
+
+        /* --- Intro : la carte tremble, flashe et se retourne --- */
+        .wn-intro {
+            position: relative;
+            z-index: 2;
+            perspective: 1000px;
+        }
+
+        .wn-intro[hidden] { display: none; }
+
+        .wn-intro-card {
+            width: 220px;
+            height: 307px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation:
+                wn-shake 0.55s ease-in-out 0.1s 1,
+                wn-flip 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.65s forwards;
+        }
+
+        @keyframes wn-shake {
+            0%, 100% { transform: rotate(0); }
+            15% { transform: rotate(-4deg) translateX(-4px); }
+            30% { transform: rotate(4deg) translateX(4px); }
+            45% { transform: rotate(-3deg) translateX(-3px); }
+            60% { transform: rotate(3deg) translateX(3px); }
+            80% { transform: rotate(-1deg); }
+        }
+
+        @keyframes wn-flip {
+            from { transform: rotateY(0) scale(1); }
+            to { transform: rotateY(180deg) scale(1.08); }
+        }
+
+        .wn-face {
+            position: absolute;
+            inset: 0;
+            border-radius: 14px;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.55), 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .wn-face-back { background: #3b2410 center / cover no-repeat; }
+
+        .wn-face-front {
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            border: 4px solid #fde68a;
+            background:
+                radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.35), transparent 55%),
+                linear-gradient(135deg, #b45309, #f59e0b 45%, #fde68a 55%, #d97706);
+            color: #1c1917;
+            text-align: center;
+        }
+
+        .wn-face-front strong { font-size: 3.4rem; line-height: 1; font-family: 'Luckiest Guy', 'Lilita One', sans-serif; letter-spacing: 0.03em; }
+        .wn-face-front span:last-child { font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.8rem; }
+
+        .wn-flash {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, rgba(255, 247, 214, 0.95), rgba(251, 191, 36, 0.5) 40%, transparent 70%);
+            opacity: 0;
+            pointer-events: none;
+            animation: wn-flash 0.5s ease-out 0.62s 1;
+        }
+
+        @keyframes wn-flash {
+            0% { opacity: 0; }
+            25% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* --- Carrousel --- */
+        .wn-panel {
+            position: relative;
+            z-index: 2;
+            width: min(520px, 100%);
+            max-height: calc(100vh - 2rem);
+            display: flex;
+            flex-direction: column;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.18), transparent 60%),
+                rgba(15, 23, 42, 0.94);
+            border: 2px solid rgba(251, 191, 36, 0.55);
+            border-radius: 20px;
+            box-shadow: 0 0 60px rgba(251, 191, 36, 0.25), 0 30px 60px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            animation: wn-panel-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes wn-panel-in {
+            from { transform: perspective(900px) rotateY(-90deg) scale(0.8); opacity: 0; }
+            to { transform: none; opacity: 1; }
+        }
+
+        .wn-head { padding: 1rem 1rem 0; text-align: center; }
+
+        .wn-version-badge {
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(251, 191, 36, 0.18);
+            border: 1px solid rgba(251, 191, 36, 0.55);
+            color: #fcd34d;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+        }
+
+        .wn-face-front .wn-version-badge { background: rgba(0, 0, 0, 0.15); color: #1c1917; border-color: rgba(0, 0, 0, 0.25); }
+
+        .wn-track {
+            display: flex;
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            touch-action: pan-y;
+        }
+
+        .wn-slide {
+            flex: 0 0 100%;
+            padding: 0.8rem 1.6rem 0.6rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.7rem;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .wn-slide h2 {
+            font-size: 1.35rem;
+            background: linear-gradient(135deg, #fde68a, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .wn-slide p { color: #cbd5e1; line-height: 1.5; font-size: 0.95rem; }
+        .wn-slide p strong { color: #fff; }
+        .wn-hint { font-size: 0.8rem !important; color: var(--text-muted) !important; }
+
+        .wn-visual {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2rem;
+            perspective: 800px;
+        }
+
+        /* Slide 1 : mini-carte qui oscille toute seule en 3D, avec reflet holo */
+        .wn-card-spin {
+            transform-style: preserve-3d;
+            animation: wn-sway 4s ease-in-out infinite;
+        }
+
+        .wn-card-spin { --glare: 1; --gx: 50%; --gy: 35%; }
+        .wn-card-spin .holo3d { --holo: 0.45; }
+        .wn-card-spin .holo3d { animation: wn-holo-move 4s ease-in-out infinite; }
+        .wn-card-spin .glare3d { animation: wn-glare-move 4s ease-in-out infinite; }
+
+        @keyframes wn-sway {
+            0%, 100% { transform: rotateY(-22deg) rotateX(8deg); }
+            50% { transform: rotateY(22deg) rotateX(-6deg); }
+        }
+
+        @keyframes wn-holo-move {
+            0%, 100% { background-position: 0% 30%; }
+            50% { background-position: 100% 70%; }
+        }
+
+        @keyframes wn-glare-move {
+            0%, 100% { background-position: -40px 0; }
+            50% { background-position: 40px 0; }
+        }
+
+        /* Slides 2 et 3 : grandes icônes animées */
+        .wn-emoji span { font-size: 4.5rem; display: inline-block; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5)); }
+        .wn-lock { animation: wn-bounce 2s ease-in-out infinite; }
+        .wn-copy { animation: wn-bounce 2s ease-in-out 0.4s infinite; }
+        .wn-swords { animation: wn-clash 1.4s ease-in-out infinite; }
+        .wn-dice { animation: wn-roll 2.2s ease-in-out infinite; }
+
+        @keyframes wn-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-14px); }
+        }
+
+        @keyframes wn-clash {
+            0%, 100% { transform: scale(1) rotate(0); }
+            40% { transform: scale(1.18) rotate(-8deg); }
+            55% { transform: scale(0.95) rotate(4deg); }
+        }
+
+        @keyframes wn-roll {
+            0%, 100% { transform: rotate(0) translateY(0); }
+            50% { transform: rotate(360deg) translateY(-12px); }
+        }
+
+        /* Slide 4 : téléphone avec l'icône de l'app */
+        .wn-phone {
+            width: 120px;
+            height: 190px;
+            border-radius: 22px;
+            border: 4px solid #475569;
+            background: linear-gradient(160deg, #1e293b, #0f172a);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            animation: wn-bounce 2.4s ease-in-out infinite;
+        }
+
+        .wn-phone img { border-radius: 16px; box-shadow: 0 0 18px rgba(251, 191, 36, 0.6); }
+        .wn-phone span { font-size: 0.75rem; font-weight: 800; color: #e2e8f0; }
+
+        .wn-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.8rem 1.2rem 1.1rem;
+        }
+
+        .wn-dots { display: flex; gap: 0.45rem; }
+
+        .wn-dots button {
+            width: 10px;
+            height: 10px;
+            padding: 0;
+            border-radius: 999px;
+            border: none;
+            background: rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .wn-dots button.active { width: 26px; background: #fbbf24; }
+
+        .btn.wn-next {
+            background: linear-gradient(135deg, #f59e0b, #b45309);
+            font-weight: 800;
+        }
+
+        .btn.wn-next.final {
+            font-size: 1.05rem;
+            padding: 0.8rem 1.3rem;
+            animation: wn-pulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes wn-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.6); }
+            50% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+        }
+
+        @media (max-width: 767px) {
+            .wn-visual { height: 160px; }
+            .wn-slide { padding: 0.6rem 1rem; }
+            .wn-slide h2 { font-size: 1.15rem; }
+            .wn-slide p { font-size: 0.88rem; }
+            .btn.wn-next.final { font-size: 0.95rem; padding: 0.7rem 0.9rem; }
+        }
+
+        /* Mouvements réduits (réglage d'accessibilité du système) : pas d'animations */
+        @media (prefers-reduced-motion: reduce) {
+            .wn-overlay *, .wn-overlay { animation: none !important; transition: none !important; }
+        }
+
         /* Bouton d'installation de l'app (visible seulement quand le navigateur la propose) */
         .btn.btn-install { background: linear-gradient(135deg, #0ea5e9, #2563eb); font-weight: 700; }
         .btn-install[hidden] { display: none; }
@@ -1997,6 +2357,7 @@
     <header>
         <h1>🃏 Studio TCGBP</h1>
         <span class="cloud-status" id="cloudStatus">☁️ Connexion…</span>
+        <button type="button" class="btn btn-whatsnew" onclick="showWhatsNewModal()">✨ Nouveautés v2.0</button>
         <span class="user-badge" id="userBadge" hidden>
             👤 <strong id="userName"></strong>
             <button class="btn btn-secondary btn-small" onclick="signOut()">Déconnexion</button>
@@ -2436,6 +2797,72 @@
         </div>
     </div>
 
+    <!-- QUOI DE NEUF (animation d'accueil après une mise à jour) -->
+    <div class="wn-overlay" id="whatsNew" hidden role="dialog" aria-modal="true" aria-labelledby="wnTitle">
+        <div class="wn-rays"></div>
+        <div class="wn-bubbles" id="wnBubbles"></div>
+        <button type="button" class="wn-skip" onclick="closeWhatsNew()">Passer ✕</button>
+
+        <!-- Intro : la carte de dos tremble, flashe et se retourne -->
+        <div class="wn-intro" id="wnIntro">
+            <div class="wn-intro-card" id="wnIntroCard">
+                <div class="wn-face wn-face-back" id="wnIntroBack"></div>
+                <div class="wn-face wn-face-front">
+                    <span class="wn-version-badge">MISE À JOUR</span>
+                    <strong>v<span class="wn-version"></span></strong>
+                    <span>Studio TCGBP</span>
+                </div>
+            </div>
+            <div class="wn-flash"></div>
+        </div>
+
+        <!-- Carrousel des nouveautés -->
+        <div class="wn-panel" id="wnPanel" hidden>
+            <div class="wn-head">
+                <span class="wn-version-badge">✨ Nouveautés v<span class="wn-version"></span></span>
+            </div>
+            <div class="wn-track" id="wnTrack">
+                <section class="wn-slide">
+                    <div class="wn-visual"><div class="wn-card-spin" id="wnCardSpin"></div></div>
+                    <h2 id="wnTitle">✨ Nouveau Cockpit &amp; Cartes 3D</h2>
+                    <p>L'éditeur passe en <strong>3 colonnes</strong> : tout se règle sans défiler. Basculez en <strong>Inspection 3D</strong> pour incliner votre carte, admirer son reflet holographique et la <strong>retourner</strong> d'un clic.</p>
+                </section>
+                <section class="wn-slide">
+                    <div class="wn-visual wn-emoji">
+                        <span class="wn-lock">🔒</span>
+                        <span class="wn-copy">📑</span>
+                    </div>
+                    <h2>🔒 Vos cartes sont protégées !</h2>
+                    <p>Chacun reste <strong>propriétaire de ses cartes</strong> : personne ne peut les modifier ou les supprimer à votre place. Ouvrir la carte d'un ami et l'enregistrer crée simplement <strong>une copie à votre nom</strong>.</p>
+                </section>
+                <section class="wn-slide">
+                    <div class="wn-visual wn-emoji">
+                        <span class="wn-swords">⚔️</span>
+                        <span class="wn-dice">🎲</span>
+                    </div>
+                    <h2>⚔️ Table de Jeu &amp; Decks en direct</h2>
+                    <p>Rejoignez un <strong>salon de combat multijoueur</strong> avec un code partagé : piochez, posez vos cartes, lancez vos sorts et suivez tout en temps réel. Composez vos <strong>decks</strong>, synchronisés entre PC et téléphone.</p>
+                </section>
+                <section class="wn-slide">
+                    <div class="wn-visual">
+                        <div class="wn-phone">
+                            <img src="icons/icon-192.png" alt="" width="72" height="72">
+                            <span>TCGBP</span>
+                        </div>
+                    </div>
+                    <h2>📲 Application Android (PWA)</h2>
+                    <p>Installez <strong>TCGBP sur votre écran d'accueil</strong> : l'app s'ouvre en plein écran, comme une vraie application, et reçoit chaque mise à jour automatiquement.</p>
+                    <button type="button" class="btn btn-install" id="wnInstallBtn" onclick="installFromWhatsNew()" hidden>📲 Installer maintenant</button>
+                    <p class="wn-hint" id="wnInstallHint">Sur Android : menu ⋮ de Chrome → « Installer l'application ».</p>
+                </section>
+            </div>
+            <div class="wn-footer">
+                <div class="wn-dots" id="wnDots"></div>
+                <button type="button" class="btn wn-next" id="wnNext" onclick="whatsNewNext()">Suivant →</button>
+            </div>
+        </div>
+    </div>
+
     <!-- BARRE D'ONGLETS MOBILE -->
     <nav class="bottom-tabs" id="bottomTabs" aria-label="Navigation">
         <button type="button" data-tab="card" class="active" onclick="setMobileTab('card')">🃏<span>Carte</span></button>
@@ -2533,6 +2960,9 @@
     </div>
 
     <script>
+        // Version affichée dans « Quoi de neuf » : l'augmenter relance l'animation chez chaque joueur
+        const APP_VERSION = '2.0';
+
         // ---------- Supabase ----------
         // Clé "publishable" : faite pour être visible dans la page. Les données sont protégées
         // par les règles de sécurité (RLS) créées dans Supabase. Ne JAMAIS mettre la clé "secret" ici.
@@ -2611,7 +3041,7 @@
             collectionOwnerKey = ownerKey;
             if (loggedIn) {
                 // On écoute d'abord, puis on charge : aucun changement ne peut passer entre les deux
-                setTimeout(() => { startRealtime(); loadSharedBack(); reloadCollection(); }, 0);
+                setTimeout(() => { startRealtime(); loadSharedBack(); reloadCollection(); maybeShowWhatsNew(); }, 0);
             } else {
                 stopRealtime();
                 if (typeof gameChannel !== 'undefined' && gameChannel) leaveTable();
@@ -2671,6 +3101,7 @@
             document.getElementById('authOverlay').hidden = true;
             setCloudStatus('📴 Mode hors ligne', 'offline');
             reloadCollection();
+            maybeShowWhatsNew();
         }
 
         const ART_HEIGHT_AUTO = 120;
@@ -4630,6 +5061,148 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape' && game && (arenaSelection || attackMode)) closeActionSheet();
         });
+
+        // =====================================================================
+        //  QUOI DE NEUF : animation d'accueil, une fois par version et par joueur
+        //  (mémorisé dans le profil Supabase + localStorage, donc PC et téléphone)
+        // =====================================================================
+        const WN_INTRO_MS = 1200;
+        let wnIndex = 0;
+        let wnTimer = null;
+
+        function hasSeenWhatsNew() {
+            let local = null;
+            try { local = localStorage.getItem('tcgbp_seen_version'); } catch (e) {}
+            return local === APP_VERSION || currentUser?.user_metadata?.seen_version === APP_VERSION;
+        }
+
+        async function maybeShowWhatsNew() {
+            if (isCloudActive()) {
+                // Profil relu sur le serveur : vu sur PC => pas relancé sur le téléphone
+                const { data } = await sb.auth.getUser();
+                if (data?.user) currentUser = data.user;
+            }
+            if (!hasSeenWhatsNew()) showWhatsNewModal();
+        }
+
+        function showWhatsNewModal() {
+            const overlay = document.getElementById('whatsNew');
+            if (!overlay.hidden) return;
+            document.querySelectorAll('.wn-version').forEach(el => el.textContent = APP_VERSION);
+            document.getElementById('wnIntroBack').style.backgroundImage = `url("${backImageSrc || DEFAULT_BACK}")`;
+
+            // Bulles de bière à positions / tailles / vitesses variées
+            const bubbles = document.getElementById('wnBubbles');
+            bubbles.innerHTML = '';
+            for (let i = 0; i < 18; i++) {
+                const b = document.createElement('span');
+                b.style.setProperty('--x', `${Math.random() * 100}%`);
+                b.style.setProperty('--s', `${6 + Math.random() * 18}px`);
+                b.style.setProperty('--d', `${6 + Math.random() * 7}s`);
+                b.style.setProperty('--delay', `${-Math.random() * 8}s`);
+                bubbles.appendChild(b);
+            }
+
+            // Slide 1 : la carte en cours d'édition, qui oscille en 3D avec reflet holo
+            document.getElementById('wnCardSpin').replaceChildren(withShine(makeMiniCard(readForm({ preview: true }), 0.42)));
+
+            // Slide 4 : bouton d'installation direct si Android le propose
+            document.getElementById('wnInstallBtn').hidden = !installPromptEvent;
+            document.getElementById('wnInstallHint').hidden = !!installPromptEvent;
+
+            const dots = document.getElementById('wnDots');
+            dots.innerHTML = '';
+            document.querySelectorAll('#wnTrack .wn-slide').forEach((_, i) => {
+                const d = document.createElement('button');
+                d.type = 'button';
+                d.setAttribute('aria-label', `Nouveauté ${i + 1}`);
+                d.onclick = () => goToWhatsNew(i);
+                dots.appendChild(d);
+            });
+
+            // Intro (carte qui tremble, flash, retournement) puis carrousel
+            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const intro = document.getElementById('wnIntro');
+            const panel = document.getElementById('wnPanel');
+            intro.hidden = reduced;
+            panel.hidden = !reduced;
+            // Relance les animations CSS de l'intro à chaque ouverture
+            const card = document.getElementById('wnIntroCard');
+            card.style.animation = 'none';
+            void card.offsetWidth;
+            card.style.animation = '';
+
+            overlay.classList.remove('closing');
+            overlay.hidden = false;
+            goToWhatsNew(0);
+            clearTimeout(wnTimer);
+            if (!reduced) {
+                wnTimer = setTimeout(() => {
+                    intro.hidden = true;
+                    panel.hidden = false;
+                    document.getElementById('wnNext').focus();
+                }, WN_INTRO_MS + 150);
+            }
+        }
+
+        function goToWhatsNew(i) {
+            const slides = document.querySelectorAll('#wnTrack .wn-slide');
+            wnIndex = Math.max(0, Math.min(slides.length - 1, i));
+            document.getElementById('wnTrack').style.transform = `translateX(-${wnIndex * 100}%)`;
+            document.querySelectorAll('#wnDots button').forEach((d, k) => d.classList.toggle('active', k === wnIndex));
+            const last = wnIndex === slides.length - 1;
+            const next = document.getElementById('wnNext');
+            next.textContent = last ? '🍺 Entrer dans la Taverne !' : 'Suivant →';
+            next.classList.toggle('final', last);
+        }
+
+        function whatsNewNext() {
+            const count = document.querySelectorAll('#wnTrack .wn-slide').length;
+            if (wnIndex >= count - 1) closeWhatsNew();
+            else goToWhatsNew(wnIndex + 1);
+        }
+
+        async function closeWhatsNew() {
+            const overlay = document.getElementById('whatsNew');
+            if (overlay.hidden) return;
+            clearTimeout(wnTimer);
+            overlay.classList.add('closing');
+            setTimeout(() => { overlay.hidden = true; overlay.classList.remove('closing'); }, 300);
+
+            try { localStorage.setItem('tcgbp_seen_version', APP_VERSION); } catch (e) {}
+            if (isCloudActive() && currentUser?.user_metadata?.seen_version !== APP_VERSION) {
+                const { data, error } = await sb.auth.updateUser({ data: { seen_version: APP_VERSION } });
+                if (error) console.warn('Nouveautés : version vue non synchronisée', error);
+                else if (data?.user) currentUser = data.user;
+            }
+        }
+
+        async function installFromWhatsNew() {
+            await installApp();
+            document.getElementById('wnInstallBtn').hidden = true;
+        }
+
+        // Clavier (flèches, Échap) et balayage au doigt dans le carrousel
+        document.addEventListener('keydown', e => {
+            if (document.getElementById('whatsNew').hidden) return;
+            if (e.key === 'Escape') closeWhatsNew();
+            else if (e.key === 'ArrowRight') whatsNewNext();
+            else if (e.key === 'ArrowLeft') goToWhatsNew(wnIndex - 1);
+        });
+
+        (() => {
+            const track = document.getElementById('wnTrack');
+            let startX = null;
+            track.addEventListener('pointerdown', e => { startX = e.clientX; });
+            track.addEventListener('pointerup', e => {
+                if (startX === null) return;
+                const dx = e.clientX - startX;
+                startX = null;
+                if (Math.abs(dx) < 50) return;
+                if (dx < 0) whatsNewNext();
+                else goToWhatsNew(wnIndex - 1);
+            });
+        })();
 
         // ---------- Application installable (PWA) ----------
         let installPromptEvent = null;
