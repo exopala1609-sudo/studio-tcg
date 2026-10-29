@@ -2,7 +2,7 @@
 // on demande toujours la dernière version au réseau (donc chaque mise à jour poussée
 // sur GitHub arrive tout de suite), et on ne sert le cache qu'en secours, hors ligne.
 
-const CACHE = 'studio-tcgbp-v1';
+const CACHE = 'studio-tcgbp-v2';
 
 // Bibliothèques externes mises en cache pour que l'app s'ouvre même sans réseau
 const CACHEABLE_HOSTS = [
