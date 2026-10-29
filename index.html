@@ -327,7 +327,7 @@
             height: 523px;
             perspective: 1100px;
             cursor: pointer;
-            touch-action: none;
+            touch-action: pan-y;
         }
 
         .tilt3d {
@@ -431,11 +431,14 @@
             background: var(--frame-bg);
             box-shadow: 0 20px 30px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1), var(--glow);
             user-select: none;
-            touch-action: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
             transition: box-shadow 0.3s ease;
         }
 
-        #renderCard { cursor: grab; }
+        #renderCard { cursor: grab; touch-action: pan-y pinch-zoom; }
+        #renderCard.drag-armed { outline: 3px solid #fbbf24; outline-offset: 4px; }
         #renderCard.dragging { cursor: grabbing; }
 
         /* Texture du cadre (selon le type) */
@@ -1085,7 +1088,7 @@
         /* Classeur de collection (plein écran) */
         .binder-overlay {
             position: fixed;
-            inset: 0;
+            inset: 0 0 var(--tabbar-h, 0px) 0;
             z-index: 900;
             background: rgba(2, 6, 23, 0.85);
             display: flex;
@@ -1097,6 +1100,9 @@
         .binder {
             flex: 1;
             min-width: 0;
+            height: 100%;
+            min-height: 0;
+            overflow: hidden;
             background:
                 radial-gradient(circle at 20% 0%, rgba(124, 58, 237, 0.15), transparent 50%),
                 var(--bg-card);
@@ -1168,6 +1174,9 @@
             align-content: start;
             align-items: start;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
             padding: 0.75rem 0.5rem 1.5rem;
             perspective: 900px;
         }
@@ -2319,7 +2328,7 @@
             }
 
             /* Classeur : sous la barre d'onglets pour pouvoir en sortir */
-            .binder-overlay { padding: 0.5rem 0.5rem calc(var(--tabbar-h) + 0.5rem); }
+            .binder-overlay { padding: 0.5rem; }
             .binder { padding: 0.9rem; }
             .collection-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
             .collection-item:hover { transform: none; box-shadow: none; }
@@ -2823,7 +2832,7 @@
         .hand {
             padding: 1.2rem 1rem 0.6rem;
             scroll-snap-type: x proximity;
-            touch-action: pan-x;
+            touch-action: pan-x pan-y;
             overscroll-behavior-x: contain;
             gap: 0.65rem;
         }
@@ -3014,7 +3023,7 @@
         <div class="editor-panel editor-panel-left">
             <!-- Illustration -->
             <div class="section-group">
-                <h3>Illustration & style <span class="help-tip" tabindex="0" data-tip="Glissez l'image sur la carte pour la déplacer, molette pour zoomer (vue Côte à côte). La forme du cadre dépend du type, sa matière de la rareté.">?</span></h3>
+                <h3>Illustration & style <span class="help-tip" tabindex="0" data-tip="Déplacer l'image : glissez-la sur la carte à la souris (molette pour zoomer), ou au doigt, gardez-le appuyé un instant puis glissez. La forme du cadre dépend du type, sa matière de la rareté.">?</span></h3>
                 <div class="form-group">
                     <label class="file-upload-btn" for="cardImageInput">
                         <i data-lucide="image-plus"></i>Changer l'image de la carte
@@ -4294,24 +4303,67 @@
             const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
             let drag = null;
 
-            card.addEventListener('pointerdown', e => {
-                if (e.button !== 0) return;
+            const startDrag = (x, y) => {
                 const img = card.querySelector('.card-art-img');
-                drag = { x: e.clientX, y: e.clientY, ox: +xEl.value, oy: +yEl.value, w: img.offsetWidth, h: img.offsetHeight };
-                card.setPointerCapture(e.pointerId);
+                drag = { x, y, ox: +xEl.value, oy: +yEl.value, w: img.offsetWidth, h: img.offsetHeight };
                 card.classList.add('dragging');
-            });
-
-            card.addEventListener('pointermove', e => {
-                if (!drag) return;
-                xEl.value = clamp(Math.round(drag.ox + (e.clientX - drag.x) / drag.w * 100), -100, 100);
-                yEl.value = clamp(Math.round(drag.oy + (e.clientY - drag.y) / drag.h * 100), -100, 100);
+            };
+            const moveDrag = (x, y) => {
+                xEl.value = clamp(Math.round(drag.ox + (x - drag.x) / drag.w * 100), -100, 100);
+                yEl.value = clamp(Math.round(drag.oy + (y - drag.y) / drag.h * 100), -100, 100);
                 updateCard();
-            });
+            };
+            const endDrag = () => { drag = null; card.classList.remove('dragging', 'drag-armed'); };
 
-            const endDrag = () => { drag = null; card.classList.remove('dragging'); };
-            card.addEventListener('pointerup', endDrag);
-            card.addEventListener('pointercancel', endDrag);
+            // Souris / stylet : on glisse directement
+            card.addEventListener('pointerdown', e => {
+                if (e.pointerType === 'touch' || e.button !== 0) return;
+                startDrag(e.clientX, e.clientY);
+                card.setPointerCapture(e.pointerId);
+            });
+            card.addEventListener('pointermove', e => {
+                if (e.pointerType === 'touch' || !drag) return;
+                moveDrag(e.clientX, e.clientY);
+            });
+            card.addEventListener('pointerup', e => { if (e.pointerType !== 'touch') endDrag(); });
+            card.addEventListener('pointercancel', e => { if (e.pointerType !== 'touch') endDrag(); });
+
+            // Doigt : un glissé normal fait défiler la page. Pour déplacer l'image, on garde
+            // le doigt immobile un instant (la carte s'entoure d'or), puis on glisse.
+            const HOLD_MS = 280, MOVE_TOLERANCE = 10;
+            let touch = null;
+            const cancelTouch = () => {
+                if (touch) clearTimeout(touch.timer);
+                touch = null;
+                endDrag();
+            };
+            card.addEventListener('touchstart', e => {
+                if (e.touches.length !== 1) return cancelTouch();
+                const t = e.touches[0];
+                touch = { x: t.clientX, y: t.clientY, active: false };
+                touch.timer = setTimeout(() => {
+                    if (!touch) return;
+                    touch.active = true;
+                    startDrag(touch.x, touch.y);
+                    card.classList.add('drag-armed');
+                    navigator.vibrate?.(12);
+                }, HOLD_MS);
+            }, { passive: true });
+            card.addEventListener('touchmove', e => {
+                if (!touch) return;
+                const t = e.touches[0];
+                if (!touch.active) {
+                    // Le doigt bouge avant la fin de l'appui : c'est un défilement, on laisse faire
+                    if (Math.hypot(t.clientX - touch.x, t.clientY - touch.y) > MOVE_TOLERANCE) cancelTouch();
+                    return;
+                }
+                e.preventDefault();   // glissé de l'image en cours : pas de défilement
+                moveDrag(t.clientX, t.clientY);
+            }, { passive: false });
+            card.addEventListener('touchend', cancelTouch);
+            card.addEventListener('touchcancel', cancelTouch);
+            // Appui long : pas de menu contextuel du navigateur
+            card.addEventListener('contextmenu', e => { if (touch || drag) e.preventDefault(); });
 
             card.addEventListener('wheel', e => {
                 e.preventDefault();
