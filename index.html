@@ -10,6 +10,8 @@
     <title>Studio TCGBP</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Icônes Lucide -->
+    <script src="https://unpkg.com/lucide@1.55.0/dist/umd/lucide.min.js"></script>
     <!-- SDK Supabase (base de données, stockage d'images, temps réel) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2338,6 +2340,611 @@
             .hand-card:hover { transform: none; }
         }
 
+        /* =====================================================================
+           REFONTE UX : icônes, header épuré, menus, Decks, arène
+           ===================================================================== */
+
+        /* Icônes Lucide du HTML statique (celles créées en JS ont leur propre taille) */
+        svg[data-lucide] { width: 16px; height: 16px; }
+        svg.lucide { flex-shrink: 0; vertical-align: -0.15em; }
+        .btn { gap: 0.45rem; }
+
+        /* ---------- Header sur une seule ligne ---------- */
+        header.app-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.55rem 1.25rem;
+            flex-wrap: nowrap;
+        }
+
+        .brand { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            border: 1px solid rgba(251, 191, 36, 0.7);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.25);
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-family: 'Luckiest Guy', 'Lilita One', sans-serif;
+            font-size: 1.45rem;
+            letter-spacing: 0.04em;
+            line-height: 1;
+            padding-top: 4px;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Pastille d'état : un point + un mot */
+        .cloud-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .cloud-status .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; }
+        .cloud-status.ok .status-dot { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+        .cloud-status.offline .status-dot { background: #f59e0b; }
+        .cloud-status.error .status-dot { background: #ef4444; }
+        .cloud-status.busy .status-dot { background: #fbbf24; animation: status-pulse 1s ease-in-out infinite; }
+        .cloud-status.ok, .cloud-status.offline, .cloud-status.error { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+
+        @keyframes status-pulse { 50% { opacity: 0.3; } }
+
+        /* Onglets principaux (centre) */
+        .main-tabs {
+            justify-self: center;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-color);
+            padding: 3px;
+        }
+
+        .main-tabs button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.95rem;
+            font-weight: 600;
+        }
+
+        .main-tabs button:hover { color: var(--text-main); }
+
+        .main-tabs button.active {
+            background: rgba(251, 191, 36, 0.14);
+            color: #fcd34d;
+            box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.4);
+        }
+
+        .tab-count {
+            display: inline-block;
+            min-width: 1.4em;
+            padding: 0 0.4em;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-align: center;
+            color: inherit;
+        }
+
+        .header-right {
+            justify-self: end;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        .user-chip strong { max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .icon-btn:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.06); }
+
+        .btn.btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn.btn-ghost:hover { background: rgba(255, 255, 255, 0.06); }
+        .btn.btn-danger { background: rgba(220, 38, 38, 0.18); color: #fca5a5; }
+        .btn.btn-danger:hover { background: rgba(220, 38, 38, 0.32); }
+        .btn.btn-icon { padding: 0.35rem; min-width: 34px; justify-content: center; }
+
+        .btn.btn-back {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .btn.btn-back:hover { background: rgba(255, 255, 255, 0.06); }
+
+        /* ---------- Menus déroulants ---------- */
+        .dropdown { position: relative; }
+        .dropdown .chev { width: 14px; height: 14px; transition: transform 0.2s ease; }
+        .dropdown.open .chev { transform: rotate(180deg); }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            z-index: 1200;
+            min-width: 250px;
+            display: none;
+            flex-direction: column;
+            padding: 0.35rem;
+            background: #172033;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+        }
+
+        .dropdown.open .dropdown-menu { display: flex; }
+        .dropdown-up .dropdown-menu { top: auto; bottom: calc(100% + 6px); }
+
+        .dropdown-menu button {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.7rem;
+            background: none;
+            border: none;
+            border-radius: 7px;
+            color: var(--text-main);
+            font-size: 0.88rem;
+            text-align: left;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .dropdown-menu button:hover { background: rgba(255, 255, 255, 0.07); }
+        .dropdown-menu button svg { color: #fbbf24; }
+        .dropdown-menu hr { border: none; border-top: 1px solid var(--border-color); margin: 0.3rem 0; }
+        .dropdown-menu .menu-logout svg { color: #f87171; }
+
+        /* ---------- Studio ---------- */
+        .studio-switch { display: none; }
+
+        .section-group h3 { display: flex; align-items: center; gap: 0.4rem; }
+
+        .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+
+        .warn-line {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: #fbbf24;
+        }
+
+        /* Aide au survol (ou au toucher) à la place des paragraphes d'astuces */
+        .help-tip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: none;
+            letter-spacing: 0;
+            cursor: help;
+            flex-shrink: 0;
+        }
+
+        .help-tip::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 8px);
+            transform: translateX(-50%);
+            z-index: 50;
+            width: max-content;
+            max-width: 260px;
+            padding: 0.55rem 0.7rem;
+            border-radius: 8px;
+            background: #0b1220;
+            border: 1px solid var(--border-color);
+            color: #cbd5e1;
+            font-size: 0.78rem;
+            font-weight: 400;
+            line-height: 1.4;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: none;
+            pointer-events: none;
+        }
+
+        /* Bulle affichée seulement au survol / toucher : cachée, elle ne crée pas de défilement */
+        .help-tip:hover::after, .help-tip:focus::after { display: block; }
+        .editor-panel { overflow-x: hidden; }
+
+        .view-toggle button { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+        .editing-badge { display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
+        .editing-badge.locked { color: #fcd34d; }
+        .editing-badge.locked::before {
+            content: '';
+            width: 14px;
+            height: 14px;
+            background: currentColor;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='11' x='3' y='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='11' x='3' y='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E") center / contain no-repeat;
+            flex-shrink: 0;
+        }
+
+        /* ---------- Vue Decks ---------- */
+        .decks-view { display: none; }
+        body[data-view="decks"] main { display: none; }
+        body[data-view="decks"] .decks-view {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            flex-direction: column;
+        }
+
+        .decks-list-view, .deck-editor {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+            overflow-y: auto;
+        }
+
+        .view-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .view-head h2 { font-size: 1.3rem; }
+        .view-sub { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.15rem; }
+
+        .deck-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1rem;
+        }
+
+        .deck-box {
+            display: flex;
+            gap: 1rem;
+            padding: 0.9rem;
+            border-radius: 12px;
+            background:
+                linear-gradient(160deg, rgba(251, 191, 36, 0.08), transparent 40%),
+                var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .deck-box:hover { border-color: rgba(251, 191, 36, 0.5); transform: translateY(-2px); }
+
+        /* Boîte de deck : la 1re carte posée sur deux cartes de dos */
+        .deck-cover { position: relative; flex-shrink: 0; padding: 0 8px 8px 0; }
+        .deck-cover::before, .deck-cover::after {
+            content: '';
+            position: absolute;
+            inset: 8px 0 0 8px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3b2410, #b45309);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+        }
+        .deck-cover::before { inset: 4px 4px 4px 4px; }
+        .deck-cover .mini-card { position: relative; z-index: 1; }
+
+        .deck-info { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; flex: 1; }
+        .deck-info h3 { font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .deck-info > span { color: var(--text-muted); font-size: 0.82rem; }
+        .deck-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: auto; }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem 1rem;
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+        }
+
+        .deck-editor-head input[type="text"] { flex: 1; min-width: 160px; font-weight: 700; }
+
+        .deck-editor-body {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 1rem;
+        }
+
+        .deck-pool, .deck-contents {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.9rem;
+        }
+
+        .deck-pool h3, .deck-contents h3 { font-size: 0.95rem; }
+        .pool-help { color: var(--text-muted); font-weight: 400; font-size: 0.8rem; }
+        .pool-head { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+        .pool-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .pool-filters input, .pool-filters select { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+
+        .pool-grid {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+            gap: 0.7rem;
+            align-content: start;
+            justify-items: center;
+            padding: 0.3rem;
+        }
+
+        .pool-tile {
+            position: relative;
+            padding: 0;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .pool-tile:hover { transform: translateY(-3px); }
+        .pool-tile:active { transform: scale(0.96); }
+        .pool-tile.in-deck { outline: 2px solid #22c55e; outline-offset: 2px; }
+
+        .pool-count {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            z-index: 2;
+            min-width: 24px;
+            padding: 0.1rem 0.35rem;
+            border-radius: 999px;
+            background: #16a34a;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .pool-count:empty { display: none; }
+
+        .deck-list { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; }
+
+        .deck-line {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.35rem 0.5rem;
+            border-radius: 8px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .deck-line.missing { opacity: 0.6; border-style: dashed; }
+        .deck-line-info { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 0.82rem; }
+        .deck-line-info strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .deck-line-info span { color: var(--text-muted); font-size: 0.72rem; }
+        .qty { display: flex; align-items: center; gap: 0.3rem; font-weight: 800; font-size: 0.85rem; }
+        .qty span { min-width: 2ch; text-align: center; }
+
+        /* ---------- Arène ---------- */
+        .lobby-card h2 { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .lobby-card h2 svg { width: 24px; height: 24px; color: #fbbf24; }
+
+        .arena-topbar {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .arena-room strong { color: var(--text-main); }
+        .arena-topbar .sidebar-toggle { margin-left: auto; }
+        .sidebar-close { display: none; }
+
+        .player-name { display: inline-flex; align-items: center; gap: 0.35rem; }
+        .stat-value { display: inline-flex; align-items: center; gap: 0.3rem; }
+        .stat-chip svg { color: #f87171; }
+        .stat-chip[title="Mana"] svg, .stat-chip:has(.lucide-droplet) svg { color: #60a5fa; }
+        .pile .pile-count { display: inline-flex; align-items: center; justify-content: center; gap: 0.2rem; }
+        .opp-hand .more { display: inline-flex; align-items: center; gap: 0.2rem; }
+        .slot { flex-direction: column; gap: 0.25rem; }
+        .hp-badge { display: inline-flex; align-items: center; gap: 0.25rem; }
+        .hp-badge svg { color: #f87171; }
+
+        /* Barre d'actions contextuelle : dans le flux, au-dessus de la main (jamais par-dessus) */
+        .action-sheet {
+            position: static;
+            transform: none;
+            width: auto;
+            z-index: auto;
+            box-shadow: none;
+            border-color: rgba(251, 191, 36, 0.5);
+            background: rgba(30, 41, 59, 0.9);
+            padding: 0.55rem 0.7rem;
+        }
+
+        .sheet-title { justify-content: flex-start; gap: 0.5rem; }
+        .sheet-title > span { flex: 1; min-width: 0; }
+        .sheet-label { display: inline-flex; align-items: center; gap: 0.25rem; }
+
+        /* Main : défilement horizontal fluide, cartes plus grandes */
+        .hand {
+            padding: 1.2rem 1rem 0.6rem;
+            scroll-snap-type: x proximity;
+            touch-action: pan-x;
+            overscroll-behavior-x: contain;
+            gap: 0.65rem;
+        }
+
+        .hand-card { position: relative; scroll-snap-align: center; }
+        .hand-card.selected { transform: translateY(-14px); outline: 3px solid #fbbf24; }
+        .hand-card:hover:not(.selected) { transform: translateY(-6px); }
+
+        /* Boutons rapides de la carte de main sélectionnée */
+        .hand-quick {
+            position: absolute;
+            left: 50%;
+            top: 0.4rem;
+            transform: translateX(-50%);
+            z-index: 3;
+            display: flex;
+            gap: 0.3rem;
+            padding: 0.25rem;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .hand-quick .btn { padding: 0.35rem 0.55rem; font-size: 0.75rem; }
+        .hand-empty { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+        .game-log li { display: flex; align-items: flex-start; gap: 0.35rem; flex-wrap: wrap; }
+        .game-log li svg { color: #fbbf24; margin-top: 2px; }
+
+        /* Modales : bouton Retour en haut à gauche */
+        .modal-toolbar { justify-content: flex-start; }
+        .modal-toolbar h2 { font-size: 1.15rem; }
+        .modal-note { font-size: 0.85rem; color: var(--text-muted); }
+        .zoom-box { max-height: 100%; }
+        .zoom-toolbar { align-self: stretch; }
+        .zoom-content { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+        .zoom-hp { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+        .binder-title { display: flex; align-items: center; gap: 0.7rem; }
+        .binder-title h2 { display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; }
+        .owner-tabs button { display: inline-flex; align-items: center; gap: 0.35rem; }
+        .owner-badge { display: inline-flex; align-items: center; gap: 0.25rem; }
+        #migrateBtn { gap: 0.45rem; }
+
+        .auth-brand { display: flex; align-items: center; justify-content: center; gap: 0.7rem; }
+        .auth-brand .brand-logo { width: 48px; height: 48px; }
+        .auth-brand .brand-name { font-size: 2rem; }
+
+        /* Quoi de neuf : icônes à la place des emojis */
+        .wn-icons span { display: inline-flex; color: #fcd34d; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5)); }
+        .wn-icons svg { width: 76px; height: 76px; stroke-width: 1.6; }
+        .wn-skip { display: inline-flex; align-items: center; gap: 0.35rem; }
+        .btn.wn-next { gap: 0.4rem; }
+
+        /* ---------- Tablette / petit PC ---------- */
+        @media (max-width: 1100px) {
+            .sidebar-close { display: inline-flex; }
+            .main-tabs button { padding: 0.45rem 0.7rem; }
+        }
+
+        @media (max-width: 900px) {
+            .deck-editor-body { grid-template-columns: 1fr; grid-template-rows: minmax(260px, 1fr) minmax(200px, 40%); }
+        }
+
+        /* ---------- Mobile ---------- */
+        @media (max-width: 767px) {
+            header.app-header {
+                grid-template-columns: 1fr auto;
+                padding: 0.5rem 0.75rem;
+                gap: 0.5rem;
+            }
+            .brand-logo { width: 32px; height: 32px; }
+            .brand-name { font-size: 1.25rem; }
+            .user-chip { display: none; }   /* Déconnexion : dans le menu Outils */
+            .hide-sm { display: none; }
+            .header-right .btn-ghost { padding: 0.45rem 0.6rem; }
+
+            /* Bascule Carte / Éditer collée en haut du Studio */
+            .studio-switch {
+                display: flex;
+                position: sticky;
+                top: 0;
+                z-index: 20;
+                gap: 0.3rem;
+                padding: 0.45rem 0.75rem;
+                background: rgba(15, 23, 42, 0.95);
+                border-bottom: 1px solid var(--border-color);
+            }
+            .studio-switch button {
+                flex: 1;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.4rem;
+                padding: 0.5rem;
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+                background: transparent;
+                color: var(--text-muted);
+                font-weight: 600;
+            }
+            .studio-switch button.active { background: rgba(251, 191, 36, 0.14); color: #fcd34d; border-color: rgba(251, 191, 36, 0.4); }
+
+            .bottom-tabs button svg { width: 21px; height: 21px; }
+            .bottom-tabs button.active { color: #fcd34d; }
+            .bottom-tabs button.active span { color: #fcd34d; }
+
+            body[data-view="decks"] .decks-view { margin-bottom: var(--tabbar-h); }
+            .decks-list-view, .deck-editor { padding: 0.8rem; }
+            .deck-grid { grid-template-columns: 1fr; }
+            .deck-editor-head .btn-back { order: -1; }
+            .deck-editor-head input[type="text"] { flex-basis: 100%; order: 1; }
+            .deck-editor-head .deck-count { order: 2; }
+            .deck-editor-head .btn-success { order: 3; margin-left: auto; }
+            .pool-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); }
+
+            .action-sheet { position: static; bottom: auto; width: auto; }
+            .board { padding-bottom: 1rem; }
+            .hand { padding: 1.2rem 0.6rem 0.6rem; }
+        }
+
         @media print {
             @page { size: A4; margin: 0; }
             * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -2354,42 +2961,63 @@
 </head>
 <body data-mtab="card" data-view="creator">
 
-    <header>
-        <h1>🃏 Studio TCGBP</h1>
-        <span class="cloud-status" id="cloudStatus">☁️ Connexion…</span>
-        <button type="button" class="btn btn-whatsnew" onclick="showWhatsNewModal()">✨ Nouveautés v2.0</button>
-        <span class="user-badge" id="userBadge" hidden>
-            👤 <strong id="userName"></strong>
-            <button class="btn btn-secondary btn-small" onclick="signOut()">Déconnexion</button>
-        </span>
-        <div class="header-actions">
-            <button class="btn btn-install" id="installBtn" onclick="installApp()" hidden>📲 Installer l'App</button>
-            <nav class="main-tabs" aria-label="Vues principales">
-                <button type="button" data-view="creator" class="active" onclick="setMainView('creator')">🛠️ Créateur</button>
-                <button type="button" data-view="collection" onclick="setMainView('collection')">📚 Collection (<span id="headerCollectionCount">0</span>)</button>
-                <button type="button" data-view="arena" onclick="setMainView('arena')">⚔️ Table de Jeu</button>
-            </nav>
-            <button class="btn creator-only btn-secondary" onclick="document.getElementById('importSingleInput').click()">📥 Importer une carte</button>
+    <header class="app-header">
+        <div class="brand">
+            <img src="icons/icon-192.png" alt="" width="36" height="36" class="brand-logo">
+            <span class="brand-name">TCGBP</span>
+            <span class="cloud-status" id="cloudStatus" role="status">
+                <span class="status-dot"></span><span class="status-text">Connexion…</span>
+            </span>
+        </div>
+
+        <nav class="main-tabs" aria-label="Vues principales">
+            <button type="button" data-view="creator" class="active" onclick="setMainView('creator')"><i data-lucide="palette"></i><span>Studio</span></button>
+            <button type="button" data-view="collection" onclick="setMainView('collection')"><i data-lucide="library"></i><span>Collection</span><span class="tab-count" id="headerCollectionCount">0</span></button>
+            <button type="button" data-view="decks" onclick="setMainView('decks')"><i data-lucide="layers"></i><span>Decks</span></button>
+            <button type="button" data-view="arena" onclick="setMainView('arena')"><i data-lucide="swords"></i><span>Arène</span></button>
+        </nav>
+
+        <div class="header-right">
+            <div class="dropdown" id="toolsMenu">
+                <button type="button" class="btn btn-ghost" aria-haspopup="menu" aria-expanded="false" onclick="toggleDropdown('toolsMenu', event)">
+                    <i data-lucide="wrench"></i><span class="hide-sm">Outils</span><i data-lucide="chevron-down" class="chev"></i>
+                </button>
+                <div class="dropdown-menu" role="menu">
+                    <button type="button" role="menuitem" onclick="document.getElementById('importSingleInput').click()"><i data-lucide="file-up"></i>Importer une carte</button>
+                    <button type="button" role="menuitem" onclick="document.getElementById('importDeckInput').click()"><i data-lucide="folder-input"></i>Importer un deck</button>
+                    <button type="button" role="menuitem" onclick="exportDeck()"><i data-lucide="download"></i>Exporter la collection</button>
+                    <button type="button" role="menuitem" id="ttsExportBtn" onclick="exportTabletopZip()"><i data-lucide="package"></i>Export Tabletop Simulator (ZIP)</button>
+                    <button type="button" role="menuitem" onclick="openPrintModal()"><i data-lucide="printer"></i>Générer une planche A4</button>
+                    <hr>
+                    <button type="button" role="menuitem" onclick="showWhatsNewModal()"><i data-lucide="sparkles"></i>Revoir les nouveautés</button>
+                    <button type="button" role="menuitem" id="installBtn" onclick="installApp()" hidden><i data-lucide="smartphone"></i>Installer l'app</button>
+                    <button type="button" role="menuitem" class="menu-logout" id="menuLogout" onclick="signOut()" hidden><i data-lucide="log-out"></i>Déconnexion</button>
+                </div>
+            </div>
             <input type="file" id="importSingleInput" accept=".json" onchange="importSingleCard(event)">
-            <button class="btn creator-only btn-secondary" onclick="document.getElementById('importDeckInput').click()">📂 Importer un deck</button>
             <input type="file" id="importDeckInput" accept=".json" onchange="importDeck(event)">
-            <button class="btn creator-only btn-secondary" onclick="exportDeck()">💾 Exporter le deck</button>
-            <button class="btn creator-only btn-secondary" id="ttsExportBtn" onclick="exportTabletopZip()">🎲 Export Tabletop Simulator (ZIP)</button>
-            <button class="btn creator-only btn-success" onclick="openPrintModal()">🖨️ Générer Planche A4 (3x3)</button>
+            <div class="user-chip" id="userBadge" hidden>
+                <i data-lucide="user-round"></i><strong id="userName"></strong>
+                <button type="button" class="icon-btn" onclick="signOut()" title="Déconnexion" aria-label="Déconnexion"><i data-lucide="log-out"></i></button>
+            </div>
         </div>
     </header>
 
     <main>
+        <!-- Mobile : bascule Carte / Éditer à l'intérieur du Studio -->
+        <div class="studio-switch" role="tablist">
+            <button type="button" data-mtab="card" class="active" onclick="setMobileTab('card')"><i data-lucide="eye"></i>Carte</button>
+            <button type="button" data-mtab="edit" onclick="setMobileTab('edit')"><i data-lucide="square-pen"></i>Éditer</button>
+        </div>
+
         <!-- PANNEAU ÉDITEUR GAUCHE : illustration, informations, verso -->
         <div class="editor-panel editor-panel-left">
-            <button class="btn btn-new-card" onclick="resetToNewCard()">➕ Nouvelle carte</button>
-
             <!-- Illustration -->
             <div class="section-group">
-                <h3>Illustration & Style</h3>
+                <h3>Illustration & style <span class="help-tip" tabindex="0" data-tip="Glissez l'image sur la carte pour la déplacer, molette pour zoomer (vue Côte à côte). La forme du cadre dépend du type, sa matière de la rareté.">?</span></h3>
                 <div class="form-group">
                     <label class="file-upload-btn" for="cardImageInput">
-                        📁 Changer l'image de la carte
+                        <i data-lucide="image-plus"></i>Changer l'image de la carte
                     </label>
                     <input type="file" id="cardImageInput" accept="image/*" onchange="handleImageUpload(event)">
                 </div>
@@ -2399,26 +3027,25 @@
                         <input type="range" id="zoomRange" min="25" max="300" value="100" oninput="updateCard()">
                     </div>
                     <div class="form-group">
-                        <label>Horizontal ← → (<span id="offsetXVal">0</span>)</label>
+                        <label>Horizontal (<span id="offsetXVal">0</span>)</label>
                         <input type="range" id="offsetXRange" min="-100" max="100" value="0" oninput="updateCard()">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Vertical ↑ ↓ (<span id="offsetYVal">0</span>)</label>
+                        <label>Vertical (<span id="offsetYVal">0</span>)</label>
                         <input type="range" id="offsetYRange" min="-100" max="100" value="0" oninput="updateCard()">
                     </div>
                     <div class="form-group" style="justify-content: flex-end; gap: 0.4rem;">
-                        <button class="btn btn-secondary btn-small" onclick="resetArtPosition()">🎯 Recentrer l'image</button>
-                        <button class="btn btn-secondary btn-small" onclick="fitWholeImage()">🖼️ Ajuster l'image entière</button>
+                        <button class="btn btn-secondary btn-small" onclick="resetArtPosition()"><i data-lucide="crosshair"></i>Recentrer</button>
+                        <button class="btn btn-secondary btn-small" onclick="fitWholeImage()"><i data-lucide="maximize-2"></i>Image entière</button>
                     </div>
                 </div>
                 <div class="form-group" id="artHeightGroup">
                     <label>Hauteur zone image (<span id="artHeightVal">Auto</span>)</label>
                     <input type="range" id="artHeightRange" min="120" max="330" step="5" value="120" oninput="updateCard()">
                 </div>
-                <p class="hint" id="textOverflowHint" style="display:none; color:#fbbf24;">⚠️ Le texte de la carte est coupé : réduisez la hauteur de la zone image.</p>
-                <p class="hint">Astuce : en vue « Côte à côte », glissez l'image directement sur la carte pour la déplacer, molette pour zoomer.</p>
+                <p class="warn-line" id="textOverflowHint" style="display:none;"><i data-lucide="circle-alert"></i>Le texte de la carte est coupé : réduisez la hauteur de la zone image.</p>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Rareté (bordure)</label>
@@ -2443,35 +3070,34 @@
                         </select>
                     </div>
                 </div>
-                <p class="hint">La forme du cadre dépend du type de carte, sa matière dépend de la rareté.</p>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="checkbox-label" style="margin-top: 5px;">
-                            <input type="checkbox" id="fullArtCheck" onchange="updateCard()"> Mode Full Art (cadre fin)
+                            <input type="checkbox" id="fullArtCheck" onchange="updateCard()"> Mode Full Art
                         </label>
                     </div>
                     <div class="form-group">
-                        <button class="btn btn-secondary btn-small" onclick="openBorderGallery()">👁️ Galerie des bordures</button>
+                        <button class="btn btn-secondary btn-small" onclick="openBorderGallery()"><i data-lucide="layout-grid"></i>Galerie des bordures</button>
                     </div>
                 </div>
             </div>
 
             <!-- Informations principales -->
             <div class="section-group">
-                <h3>Informations & Gameplay</h3>
+                <h3>Informations & gameplay</h3>
                 <div class="form-row">
                     <div class="form-group" style="flex: 2;">
                         <label>Nom de la carte</label>
                         <input type="text" id="cardNameInput" value="" placeholder="Dragon Ancien" oninput="updateCard()">
                     </div>
                     <div class="form-group" style="flex: 1;">
-                        <label>Coût Mana</label>
+                        <label>Coût mana</label>
                         <input type="number" id="cardManaInput" value="5" min="0" max="20" oninput="updateCard()">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Couleur Coût Mana</label>
+                        <label>Couleur du mana</label>
                         <select id="manaColorInput" onchange="updateCard()">
                             <option value="fire">Feu (Rouge)</option>
                             <option value="water">Eau (Bleu)</option>
@@ -2482,7 +3108,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Type de Carte</label>
+                        <label>Type de carte</label>
                         <select id="cardTypeInput" onchange="updateCard()">
                             <option value="hero" selected>Héros</option>
                             <option value="spell">Sort</option>
@@ -2509,16 +3135,21 @@
                         </select>
                     </div>
                 </div>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="demoTextCheck" checked onchange="setDemoTextEnabled(this.checked)">
+                    Afficher des textes d'exemple dans les champs vides
+                    <span class="help-tip" tabindex="0" data-tip="Aperçu uniquement : les exemples ne sont jamais enregistrés. Décochez pour voir la carte telle qu'elle sera, sans 2e sort ni capacité passive par exemple.">?</span>
+                </label>
             </div>
 
             <!-- Verso -->
             <div class="section-group">
-                <h3>Verso (commun à toutes les cartes)</h3>
-                <label class="file-upload-btn" for="backImageInput">🖼️ Importer notre illustration de verso</label>
+                <h3>Verso commun <span class="help-tip" tabindex="0" data-tip="Le verso est partagé par toutes les cartes de tout le groupe.">?</span></h3>
+                <label class="file-upload-btn" for="backImageInput"><i data-lucide="image-plus"></i>Importer une illustration de verso</label>
                 <input type="file" id="backImageInput" accept="image/*" onchange="handleBackUpload(event)">
                 <div class="form-row">
-                    <button class="btn btn-secondary btn-small" onclick="resetBack()">↺ Verso de base</button>
-                    <button class="btn btn-secondary btn-small" onclick="downloadBackImage()">📥 Verso PNG HD</button>
+                    <button class="btn btn-secondary btn-small" onclick="resetBack()"><i data-lucide="rotate-ccw"></i>Verso de base</button>
+                    <button class="btn btn-secondary btn-small" onclick="downloadBackImage()"><i data-lucide="image-down"></i>Verso en PNG</button>
                 </div>
             </div>
         </div>
@@ -2526,8 +3157,8 @@
         <!-- ZONE CENTRALE : aperçu + actions toujours accessibles -->
         <div class="preview-panel">
             <div class="view-toggle" role="tablist">
-                <button type="button" id="viewEditBtn" class="active" onclick="setPreviewMode('edit')">👁️ Côte à côte (Édition)</button>
-                <button type="button" id="view3dBtn" onclick="setPreviewMode('3d')">✨ Inspection 3D</button>
+                <button type="button" id="viewEditBtn" class="active" onclick="setPreviewMode('edit')"><i data-lucide="eye"></i>Côte à côte</button>
+                <button type="button" id="view3dBtn" onclick="setPreviewMode('3d')"><i data-lucide="rotate-3d"></i>Inspection 3D</button>
             </div>
 
             <div class="preview-container">
@@ -2595,7 +3226,7 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-secondary btn-small" onclick="flip3d()">🔄 Retourner (Recto/Verso)</button>
+                <button type="button" class="btn btn-secondary btn-small" onclick="flip3d()"><i data-lucide="refresh-cw"></i>Retourner</button>
               </div>
             </div>
 
@@ -2603,11 +3234,16 @@
             <div class="center-actions">
                 <div class="editing-badge" id="editingBadge"></div>
                 <div class="action-bar">
-                    <button class="btn btn-new-card" onclick="resetToNewCard()">➕ Nouvelle carte</button>
-                    <button class="btn btn-secondary" id="updateCardBtn" onclick="updateCurrentCard()" disabled>💾 Mettre à jour</button>
-                    <button class="btn btn-secondary" onclick="saveAsNewCard()">📥 Ajouter à la collection</button>
-                    <button class="btn btn-secondary" onclick="exportSingleCardJSON()">📤 Exporter la carte</button>
-                    <button class="btn" onclick="downloadCardImage()">🖼️ PNG HD</button>
+                    <button class="btn btn-new-card" onclick="resetToNewCard()"><i data-lucide="plus"></i>Nouvelle carte</button>
+                    <button class="btn btn-secondary" id="updateCardBtn" onclick="updateCurrentCard()" disabled><i data-lucide="save"></i>Mettre à jour</button>
+                    <button class="btn btn-secondary" onclick="saveAsNewCard()"><i data-lucide="book-plus"></i>Ajouter à la collection</button>
+                    <div class="dropdown dropdown-up" id="exportMenu">
+                        <button type="button" class="btn" aria-haspopup="menu" aria-expanded="false" onclick="toggleDropdown('exportMenu', event)"><i data-lucide="download"></i>Exporter<i data-lucide="chevron-down" class="chev"></i></button>
+                        <div class="dropdown-menu" role="menu">
+                            <button type="button" role="menuitem" onclick="downloadCardImage()"><i data-lucide="image-down"></i>Image PNG haute définition</button>
+                            <button type="button" role="menuitem" onclick="exportSingleCardJSON()"><i data-lucide="file-json"></i>Fichier de carte (JSON)</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2616,9 +3252,9 @@
         <div class="editor-panel editor-panel-right">
             <!-- Stats & Capacités -->
             <div class="section-group">
-                <h3>Capacités & Stats</h3>
+                <h3>Capacités & stats</h3>
                 <div class="form-group">
-                    <label>❤️ Points de Vie (PV) — vide = non affiché</label>
+                    <label>Points de vie (PV) <span class="help-tip" tabindex="0" data-tip="Laissez vide pour ne pas afficher de PV sur la carte.">?</span></label>
                     <input type="text" id="cardHpInput" value="" placeholder="120" oninput="updateCard()">
                 </div>
                 <div class="form-group">
@@ -2653,42 +3289,87 @@
                     <textarea id="spell2Text" placeholder="Description (optionnel)" oninput="updateCard()"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Description / Lore</label>
+                    <label>Description / lore</label>
                     <textarea id="cardFlavorInput" style="min-height: 45px;" placeholder="Il régna sur les pics incandescents durant des millénaires." oninput="updateCard()"></textarea>
                 </div>
             </div>
 
             <!-- Set & Artiste -->
             <div class="section-group">
-                <h3>Set & Illustrateur</h3>
+                <h3>Set & illustrateur</h3>
                 <div class="form-group">
                     <label>Nom du set</label>
                     <input type="text" id="cardSetNameInput" value="" placeholder="Édition de base" oninput="updateCard()">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>N° de Carte</label>
+                        <label>N° de carte</label>
                         <input type="text" id="cardNumInput" value="001" oninput="updateCard()">
                     </div>
                     <div class="form-group">
-                        <label>Total Set</label>
+                        <label>Total du set</label>
                         <input type="text" id="cardTotalSetInput" value="050" oninput="updateCard()">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Nom de l'Artiste</label>
+                    <label>Nom de l'artiste</label>
                     <input type="text" id="cardArtistInput" value="" placeholder="Studio TCG" oninput="updateCard()">
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- DECKS -->
+    <section class="decks-view" id="decksView">
+        <div class="decks-list-view" id="decksListView">
+            <div class="view-head">
+                <div>
+                    <h2>Mes decks</h2>
+                    <p class="view-sub" id="decksSyncNote">Synchronisés entre vos appareils.</p>
+                </div>
+                <button class="btn" onclick="openDeckEditor()"><i data-lucide="plus"></i>Créer un nouveau deck</button>
+            </div>
+            <div class="deck-grid" id="deckGrid"></div>
+        </div>
+
+        <div class="deck-editor" id="deckEditor" hidden>
+            <div class="view-head deck-editor-head">
+                <button class="btn btn-back" onclick="closeDeckEditor()"><i data-lucide="arrow-left"></i>Retour à mes decks</button>
+                <input type="text" id="deckNameInput" placeholder="Nom du deck" maxlength="40">
+                <span class="deck-count" id="deckEditorCount">0 carte</span>
+                <button class="btn btn-success" onclick="saveDeckFromEditor()"><i data-lucide="save"></i>Enregistrer</button>
+            </div>
+            <div class="deck-editor-body">
+                <div class="deck-pool">
+                    <div class="pool-head">
+                        <h3>Collection <span class="pool-help">— touchez une carte pour l'ajouter</span></h3>
+                        <div class="pool-filters">
+                            <input type="search" id="deckSearchInput" placeholder="Filtrer…" oninput="renderDeckPool()">
+                            <select id="deckTypeFilter" onchange="renderDeckPool()">
+                                <option value="">Tous les types</option>
+                                <option value="hero">Héros</option>
+                                <option value="spell">Sort</option>
+                                <option value="artifact">Artefact</option>
+                                <option value="land">Terrain</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pool-grid" id="deckPool"></div>
+                </div>
+                <div class="deck-contents">
+                    <h3>Dans le deck</h3>
+                    <div class="deck-list" id="deckContents"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- TABLE DE JEU (ARÈNE) -->
     <section class="arena" id="arena">
         <!-- Lobby : salon + deck de départ -->
         <div class="arena-lobby" id="arenaLobby">
             <div class="lobby-card">
-                <h2>⚔️ Table de Jeu</h2>
+                <h2><i data-lucide="swords"></i>Arène</h2>
                 <p class="lobby-notice" id="lobbyNotice"></p>
                 <div class="form-group">
                     <label for="roomCodeInput">Code du salon (donnez le même à votre ami)</label>
@@ -2704,21 +3385,18 @@
                         <input type="radio" name="deckMode" value="random">
                         <span>Mélange aléatoire de
                             <input type="number" id="randomDeckSize" value="20" min="5" max="80" class="inline-number">
-                            cartes de toute la collection commune</span>
+                            cartes de la collection commune</span>
                     </label>
                     <label class="radio-row">
                         <input type="radio" name="deckMode" value="custom">
-                        <span>Sélection personnalisée :</span>
+                        <span>Un de mes decks :</span>
                     </label>
                     <div class="deck-picker">
                         <select id="deckSelect" onchange="document.querySelector('input[name=deckMode][value=custom]').checked = true"></select>
-                        <button type="button" class="btn btn-secondary btn-small" onclick="openDeckBuilder()">➕ Nouveau</button>
-                        <button type="button" class="btn btn-secondary btn-small" onclick="openDeckBuilder(document.getElementById('deckSelect').value)">✏️ Modifier</button>
-                        <button type="button" class="btn btn-secondary btn-small" onclick="deleteDeck()">🗑️</button>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="setMainView('decks')"><i data-lucide="layers"></i>Gérer mes decks</button>
                     </div>
-                    <p class="hint" id="deckSyncHint">Vos decks sont synchronisés entre vos appareils (PC, Android).</p>
                 </fieldset>
-                <button class="btn btn-join" onclick="joinTable(false)">🍺 Rejoindre la table</button>
+                <button class="btn btn-join" onclick="joinTable(false)"><i data-lucide="beer"></i>Rejoindre la table</button>
                 <button class="btn btn-secondary" id="resumeBtn" onclick="joinTable(true)" hidden></button>
             </div>
         </div>
@@ -2726,6 +3404,12 @@
         <!-- Partie en cours -->
         <div class="arena-game" id="arenaGame" hidden>
             <div class="board" id="board">
+                <div class="arena-topbar">
+                    <button class="btn btn-back btn-small" onclick="leaveTable()"><i data-lucide="arrow-left"></i>Lobby</button>
+                    <span class="arena-room">Salon <strong id="roomLabel"></strong></span>
+                    <button class="btn btn-secondary btn-small sidebar-toggle" onclick="toggleArenaSidebar()"><i data-lucide="scroll-text"></i>Journal</button>
+                </div>
+
                 <div class="player-zone opponent" id="zoneOpp">
                     <div class="player-bar" id="barOpp"></div>
                     <div class="front-row" id="rowOpp"></div>
@@ -2733,16 +3417,17 @@
 
                 <div class="center-bar">
                     <span class="turn-indicator" id="turnIndicator"></span>
-                    <button class="btn btn-small btn-new-card" id="startTurnBtn" onclick="startMyTurn()" hidden>▶️ Débuter mon tour</button>
-                    <button class="btn btn-small" id="endTurnBtn" onclick="endTurn()">⏭️ Fin de tour</button>
-                    <button class="btn btn-secondary btn-small" onclick="rollDice(6)">🎲 1d6</button>
-                    <button class="btn btn-secondary btn-small" onclick="rollDice(20)">🎲 1d20</button>
-                    <button class="btn btn-secondary btn-small" id="shuffleBtn" onclick="shuffleMyDeck()">🔄 Mélanger ma pioche</button>
-                    <button class="btn btn-secondary btn-small sidebar-toggle" onclick="toggleArenaSidebar()">📜 Journal</button>
+                    <button class="btn btn-small btn-new-card" id="startTurnBtn" onclick="startMyTurn()" hidden><i data-lucide="play"></i>Débuter mon tour</button>
+                    <button class="btn btn-small" id="endTurnBtn" onclick="endTurn()"><i data-lucide="skip-forward"></i>Fin de tour</button>
+                    <button class="btn btn-secondary btn-small" onclick="rollDice(6)"><i data-lucide="dices"></i>1d6</button>
+                    <button class="btn btn-secondary btn-small" onclick="rollDice(20)"><i data-lucide="dices"></i>1d20</button>
+                    <button class="btn btn-secondary btn-small" id="shuffleBtn" onclick="shuffleMyDeck()"><i data-lucide="shuffle"></i>Mélanger</button>
                 </div>
 
                 <div class="player-zone me" id="zoneMe">
                     <div class="front-row" id="rowMe"></div>
+                    <!-- Actions de la carte sélectionnée : au-dessus de la main, jamais par-dessus -->
+                    <div class="action-sheet" id="actionSheet" hidden></div>
                     <div class="player-bar" id="barMe"></div>
                     <div class="hand" id="handMe"></div>
                 </div>
@@ -2750,50 +3435,35 @@
 
             <aside class="arena-sidebar" id="arenaSidebar">
                 <div class="sidebar-head">
-                    <strong>Salon <span id="roomLabel"></span></strong>
-                    <button class="btn btn-secondary btn-small" onclick="leaveTable()">🚪 Quitter</button>
+                    <strong>Joueurs</strong>
+                    <button type="button" class="icon-btn sidebar-close" onclick="toggleArenaSidebar()" aria-label="Fermer le journal"><i data-lucide="x"></i></button>
                 </div>
                 <div class="presence-list" id="presenceList"></div>
-                <h4>📜 Journal</h4>
+                <h4>Journal</h4>
                 <ol class="game-log" id="gameLog"></ol>
-                <button class="btn btn-secondary btn-small" id="resetGameBtn" onclick="resetGame()">♻️ Nouvelle partie (même deck)</button>
+                <button class="btn btn-secondary btn-small" id="resetGameBtn" onclick="resetGame()"><i data-lucide="rotate-ccw"></i>Nouvelle partie (même deck)</button>
             </aside>
-
-            <!-- Actions de la carte sélectionnée (souris ou doigt) -->
-            <div class="action-sheet" id="actionSheet" hidden></div>
         </div>
     </section>
 
     <!-- MODALE : ZOOM SUR UNE CARTE -->
     <div class="modal-overlay arena-modal" id="zoomModal" onclick="if (event.target === this) closeModal('zoomModal')">
-        <div class="zoom-box" id="zoomBox"></div>
+        <div class="zoom-box">
+            <div class="modal-toolbar zoom-toolbar">
+                <button class="btn btn-back btn-small" onclick="closeModal('zoomModal')"><i data-lucide="arrow-left"></i>Retour</button>
+            </div>
+            <div class="zoom-content" id="zoomBox"></div>
+        </div>
     </div>
 
     <!-- MODALE : CIMETIÈRE -->
     <div class="modal-overlay arena-modal" id="graveModal" onclick="if (event.target === this) closeModal('graveModal')">
         <div class="modal-content">
             <div class="modal-toolbar">
-                <h2 id="graveTitle">💀 Cimetière</h2>
-                <button class="btn btn-secondary" onclick="closeModal('graveModal')">Fermer</button>
+                <button class="btn btn-back btn-small" onclick="closeModal('graveModal')"><i data-lucide="arrow-left"></i>Retour</button>
+                <h2 id="graveTitle">Cimetière</h2>
             </div>
             <div class="grave-grid" id="graveGrid"></div>
-        </div>
-    </div>
-
-    <!-- MODALE : CONSTRUCTEUR DE DECK -->
-    <div class="modal-overlay arena-modal" id="deckModal" onclick="if (event.target === this) closeModal('deckModal')">
-        <div class="modal-content wide">
-            <div class="modal-toolbar">
-                <h2>🗂️ Constructeur de deck</h2>
-                <button class="btn btn-secondary" onclick="closeModal('deckModal')">Fermer</button>
-            </div>
-            <div class="deck-builder-head">
-                <input type="text" id="deckNameInput" placeholder="Nom du deck (ex : Dragons de feu)" maxlength="40">
-                <input type="search" id="deckSearchInput" placeholder="🔍 Filtrer…" oninput="renderDeckBuilderList()">
-                <span class="deck-count" id="deckBuilderCount">0 carte</span>
-                <button class="btn btn-success" onclick="saveDeckFromBuilder()">💾 Enregistrer le deck</button>
-            </div>
-            <div class="deck-builder-list" id="deckBuilderList"></div>
         </div>
     </div>
 
@@ -2801,7 +3471,7 @@
     <div class="wn-overlay" id="whatsNew" hidden role="dialog" aria-modal="true" aria-labelledby="wnTitle">
         <div class="wn-rays"></div>
         <div class="wn-bubbles" id="wnBubbles"></div>
-        <button type="button" class="wn-skip" onclick="closeWhatsNew()">Passer ✕</button>
+        <button type="button" class="wn-skip" onclick="closeWhatsNew()">Passer<i data-lucide="x"></i></button>
 
         <!-- Intro : la carte de dos tremble, flashe et se retourne -->
         <div class="wn-intro" id="wnIntro">
@@ -2819,28 +3489,28 @@
         <!-- Carrousel des nouveautés -->
         <div class="wn-panel" id="wnPanel" hidden>
             <div class="wn-head">
-                <span class="wn-version-badge">✨ Nouveautés v<span class="wn-version"></span></span>
+                <span class="wn-version-badge">Nouveautés v<span class="wn-version"></span></span>
             </div>
             <div class="wn-track" id="wnTrack">
                 <section class="wn-slide">
                     <div class="wn-visual"><div class="wn-card-spin" id="wnCardSpin"></div></div>
-                    <h2 id="wnTitle">✨ Nouveau Cockpit &amp; Cartes 3D</h2>
+                    <h2 id="wnTitle">Nouveau cockpit &amp; cartes 3D</h2>
                     <p>L'éditeur passe en <strong>3 colonnes</strong> : tout se règle sans défiler. Basculez en <strong>Inspection 3D</strong> pour incliner votre carte, admirer son reflet holographique et la <strong>retourner</strong> d'un clic.</p>
                 </section>
                 <section class="wn-slide">
-                    <div class="wn-visual wn-emoji">
-                        <span class="wn-lock">🔒</span>
-                        <span class="wn-copy">📑</span>
+                    <div class="wn-visual wn-icons">
+                        <span class="wn-lock"><i data-lucide="lock"></i></span>
+                        <span class="wn-copy"><i data-lucide="copy"></i></span>
                     </div>
-                    <h2>🔒 Vos cartes sont protégées !</h2>
+                    <h2>Vos cartes sont protégées</h2>
                     <p>Chacun reste <strong>propriétaire de ses cartes</strong> : personne ne peut les modifier ou les supprimer à votre place. Ouvrir la carte d'un ami et l'enregistrer crée simplement <strong>une copie à votre nom</strong>.</p>
                 </section>
                 <section class="wn-slide">
-                    <div class="wn-visual wn-emoji">
-                        <span class="wn-swords">⚔️</span>
-                        <span class="wn-dice">🎲</span>
+                    <div class="wn-visual wn-icons">
+                        <span class="wn-swords"><i data-lucide="swords"></i></span>
+                        <span class="wn-dice"><i data-lucide="dices"></i></span>
                     </div>
-                    <h2>⚔️ Table de Jeu &amp; Decks en direct</h2>
+                    <h2>Arène &amp; decks en direct</h2>
                     <p>Rejoignez un <strong>salon de combat multijoueur</strong> avec un code partagé : piochez, posez vos cartes, lancez vos sorts et suivez tout en temps réel. Composez vos <strong>decks</strong>, synchronisés entre PC et téléphone.</p>
                 </section>
                 <section class="wn-slide">
@@ -2850,34 +3520,37 @@
                             <span>TCGBP</span>
                         </div>
                     </div>
-                    <h2>📲 Application Android (PWA)</h2>
+                    <h2>Application Android</h2>
                     <p>Installez <strong>TCGBP sur votre écran d'accueil</strong> : l'app s'ouvre en plein écran, comme une vraie application, et reçoit chaque mise à jour automatiquement.</p>
-                    <button type="button" class="btn btn-install" id="wnInstallBtn" onclick="installFromWhatsNew()" hidden>📲 Installer maintenant</button>
-                    <p class="wn-hint" id="wnInstallHint">Sur Android : menu ⋮ de Chrome → « Installer l'application ».</p>
+                    <button type="button" class="btn btn-install" id="wnInstallBtn" onclick="installFromWhatsNew()" hidden><i data-lucide="smartphone"></i>Installer maintenant</button>
+                    <p class="wn-hint" id="wnInstallHint">Sur Android : menu de Chrome, puis « Installer l'application ».</p>
                 </section>
             </div>
             <div class="wn-footer">
                 <div class="wn-dots" id="wnDots"></div>
-                <button type="button" class="btn wn-next" id="wnNext" onclick="whatsNewNext()">Suivant →</button>
+                <button type="button" class="btn wn-next" id="wnNext" onclick="whatsNewNext()">Suivant</button>
             </div>
         </div>
     </div>
 
     <!-- BARRE D'ONGLETS MOBILE -->
     <nav class="bottom-tabs" id="bottomTabs" aria-label="Navigation">
-        <button type="button" data-tab="card" class="active" onclick="setMobileTab('card')">🃏<span>Carte</span></button>
-        <button type="button" data-tab="edit" onclick="setMobileTab('edit')">✏️<span>Éditer</span></button>
-        <button type="button" data-tab="collection" onclick="setMobileTab('collection')">📚<span>Collection</span><b class="tab-badge" id="tabCollectionCount">0</b></button>
-        <button type="button" data-tab="arena" onclick="setMobileTab('arena')">⚔️<span>Arène</span></button>
+        <button type="button" data-tab="creator" class="active" onclick="setMainView('creator')"><i data-lucide="palette"></i><span>Studio</span></button>
+        <button type="button" data-tab="collection" onclick="setMainView('collection')"><i data-lucide="library"></i><span>Collection</span><b class="tab-badge" id="tabCollectionCount">0</b></button>
+        <button type="button" data-tab="decks" onclick="setMainView('decks')"><i data-lucide="layers"></i><span>Decks</span></button>
+        <button type="button" data-tab="arena" onclick="setMainView('arena')"><i data-lucide="swords"></i><span>Arène</span></button>
     </nav>
 
     <!-- CLASSEUR DE COLLECTION (plein écran) -->
     <div class="binder-overlay" id="binderOverlay" hidden onclick="if (event.target === this) closeBinder()">
         <div class="binder">
             <div class="binder-header">
-                <h2>📚 Classeur de collection (<span id="collectionCount">0</span>)</h2>
+                <div class="binder-title">
+                    <button class="btn btn-back btn-small" onclick="closeBinder()"><i data-lucide="arrow-left"></i>Retour</button>
+                    <h2>Classeur de collection <span class="tab-count" id="collectionCount">0</span></h2>
+                </div>
                 <div class="collection-filters">
-                    <input type="search" id="collectionSearch" placeholder="🔍 Rechercher…" oninput="renderCollection()">
+                    <input type="search" id="collectionSearch" placeholder="Rechercher…" oninput="renderCollection()">
                     <select id="collectionTypeFilter" onchange="renderCollection()">
                         <option value="">Tous les types</option>
                         <option value="hero">Héros</option>
@@ -2885,8 +3558,7 @@
                         <option value="artifact">Artefact</option>
                         <option value="land">Terrain</option>
                     </select>
-                    <button class="btn btn-secondary btn-small" onclick="clearCollection()">Vider</button>
-                    <button class="btn btn-small" onclick="closeBinder()">✕ Fermer</button>
+                    <button class="btn btn-secondary btn-small" onclick="clearCollection()"><i data-lucide="trash-2"></i>Vider</button>
                 </div>
             </div>
             <div class="owner-tabs" id="collectionOwnerTabs"></div>
@@ -2900,7 +3572,10 @@
     <!-- ÉCRAN DE CONNEXION -->
     <div class="auth-overlay" id="authOverlay" hidden>
         <div class="auth-card">
-            <h2>🃏 Studio TCG</h2>
+            <div class="auth-brand">
+                <img src="icons/icon-192.png" alt="" width="48" height="48" class="brand-logo">
+                <span class="brand-name">TCGBP</span>
+            </div>
             <div class="auth-tabs">
                 <button type="button" id="tabLogin" class="active" onclick="setAuthMode('login')">Se connecter</button>
                 <button type="button" id="tabSignup" onclick="setAuthMode('signup')">Créer un compte</button>
@@ -2929,10 +3604,9 @@
     <div class="modal-overlay" id="galleryModal" onclick="if (event.target === this) closeModal('galleryModal')">
         <div class="modal-content wide">
             <div class="modal-toolbar">
-                <h2>Galerie des bordures (Type × Rareté)</h2>
-                <button class="btn btn-secondary" onclick="closeModal('galleryModal')">Fermer</button>
+                <button class="btn btn-back btn-small" onclick="closeModal('galleryModal')"><i data-lucide="arrow-left"></i>Retour</button>
+                <h2>Galerie des bordures</h2>
             </div>
-            <p class="hint">Aperçu avec la carte en cours d'édition. Cliquez sur une bordure pour l'appliquer.</p>
             <div class="gallery-grid" id="galleryGrid"></div>
         </div>
     </div>
@@ -2941,20 +3615,20 @@
     <div class="modal-overlay" id="printModal">
         <div class="modal-content">
             <div class="modal-toolbar no-print">
-                <h2>Aperçu Impression Planche A4 (Grille 3x3)</h2>
-                <button class="btn btn-secondary" onclick="closeModal('printModal')">Fermer</button>
+                <button class="btn btn-back btn-small" onclick="closeModal('printModal')"><i data-lucide="arrow-left"></i>Retour</button>
+                <h2>Planche A4 (grille 3x3)</h2>
             </div>
-            <p class="no-print" style="font-size: 0.85rem; color: var(--text-muted);">
-                Planches au format A4 réel (9 cartes de 63x88mm par page, une page par tranche de 9 cartes). Seules les planches sont imprimées. Pensez à décocher les en-têtes/pieds de page du navigateur.
+            <p class="no-print modal-note">
+                Format A4 réel : 9 cartes de 63x88 mm par page. Seules les planches sont imprimées ; décochez les en-têtes et pieds de page du navigateur.
             </p>
             <label class="checkbox-label no-print">
-                <input type="checkbox" id="printBacksCheck" onchange="renderPrintSheets()"> Ajouter les planches de verso (impression recto-verso, retournement bord long)
+                <input type="checkbox" id="printBacksCheck" onchange="renderPrintSheets()"> Ajouter les planches de verso (recto-verso, retournement bord long)
             </label>
             <div class="print-preview-wrap" id="printSheetContainer">
                 <!-- Généré dynamiquement -->
             </div>
             <div class="no-print" style="text-align: right;">
-                <button class="btn btn-success" onclick="window.print()">🖨️ Lancer l'impression</button>
+                <button class="btn btn-success" onclick="window.print()"><i data-lucide="printer"></i>Lancer l'impression</button>
             </div>
         </div>
     </div>
@@ -2974,24 +3648,24 @@
 
         function setCloudStatus(text, state) {
             const el = document.getElementById('cloudStatus');
-            el.textContent = text;
-            el.className = 'cloud-status' + (state ? ' ' + state : '');
+            el.querySelector('.status-text').textContent = text;
+            el.className = 'cloud-status' + (state ? ' ' + state : ' busy');
         }
 
         // Vérifie que l'URL et la clé sont valides (sans connexion utilisateur, la table
         // apparaît vide à cause des règles de sécurité : c'est normal)
         async function checkSupabaseConnection() {
             if (!sb) {
-                setCloudStatus('⚠️ SDK Supabase non chargé', 'error');
+                setCloudStatus('Hors ligne', 'error');
                 return false;
             }
             const { error } = await sb.from('cards').select('id', { count: 'exact', head: true });
             if (error) {
                 console.error('Supabase :', error);
-                setCloudStatus('⚠️ Supabase injoignable', 'error');
+                setCloudStatus('Hors ligne', 'error');
                 return false;
             }
-            setCloudStatus('☁️ Connecté à Supabase', 'ok');
+            setCloudStatus('En ligne', 'ok');
             return true;
         }
 
@@ -3032,6 +3706,7 @@
             if (loggedIn) offlineMode = false;
             document.getElementById('authOverlay').hidden = loggedIn || offlineMode;
             document.getElementById('userBadge').hidden = !loggedIn;
+            document.getElementById('menuLogout').hidden = !loggedIn;
             document.getElementById('userName').textContent = displayName(currentUser);
             if (!loggedIn && !offlineMode) setAuthMode(authMode);
             // Rechargement seulement si l'utilisateur change (pas à chaque rafraîchissement de jeton),
@@ -3099,7 +3774,7 @@
             offlineMode = true;
             collectionOwnerKey = 'local';
             document.getElementById('authOverlay').hidden = true;
-            setCloudStatus('📴 Mode hors ligne', 'offline');
+            setCloudStatus('Hors ligne', 'offline');
             reloadCollection();
             maybeShowWhatsNew();
         }
@@ -3133,6 +3808,8 @@
             applyBack();
             initArtInteractions();
             init3dTilt();
+            document.getElementById('demoTextCheck').checked = demoTextEnabled;
+            if (window.lucide) lucide.createIcons();
             updateCardZoom();
             initPwa();
             updateCard();
@@ -3220,10 +3897,28 @@
             return TEXT_FIELDS.every(id => !document.getElementById(id).value.trim());
         }
 
-        // preview: true = valeurs d'exemple si rien n'est saisi (affichage uniquement, jamais enregistrées)
+        // Exemples affichés dans les champs vides (préférence mémorisée sur l'appareil)
+        let demoTextEnabled = (() => { try { return localStorage.getItem('tcgbp_demo_text') !== '0'; } catch (e) { return true; } })();
+
+        function setDemoTextEnabled(on) {
+            demoTextEnabled = on;
+            try { localStorage.setItem('tcgbp_demo_text', on ? '1' : '0'); } catch (e) {}
+            updateCard();
+        }
+
+        // preview: true = valeurs d'exemple pour les champs encore vides (affichage uniquement, jamais enregistrées)
         function readForm({ preview = false } = {}) {
-            const demo = preview && !currentCardId && isFormBlank();
-            const v = id => (demo && id in DEMO_TEXT) ? DEMO_TEXT[id] : document.getElementById(id).value;
+            const demoOn = preview && !currentCardId && demoTextEnabled;
+            const raw = id => document.getElementById(id).value;
+            // Un sort dont le joueur a saisi le nom n'hérite pas des dégâts / du texte d'exemple
+            const ownSpell = { 1: !!raw('spell1Name').trim(), 2: !!raw('spell2Name').trim() };
+            const v = id => {
+                const val = raw(id);
+                if (!demoOn || val.trim() || !(id in DEMO_TEXT)) return val;
+                const spellField = id.match(/^spell(\d)(Dmg|Text)$/);
+                if (spellField && ownSpell[spellField[1]]) return val;
+                return DEMO_TEXT[id];
+            };
             return {
                 name: v('cardNameInput'),
                 mana: v('cardManaInput'),
@@ -3534,7 +4229,7 @@
         // En mode cloud, renvoie l'URL publique ; hors ligne (ou si l'envoi échoue), garde l'image locale
         async function uploadIfCloud(dataUrl, folder) {
             if (!isCloudActive()) return dataUrl;
-            setCloudStatus("⏳ Envoi de l'image…");
+            setCloudStatus("Envoi de l'image…");
             try {
                 return await uploadImage(dataUrl, folder);
             } catch (err) {
@@ -3674,10 +4369,11 @@
             const locked = !!current && !isOwnCard(current);
             const btn = document.getElementById('updateCardBtn');
             btn.disabled = !current;
-            btn.textContent = locked ? '📑 Dupliquer à mon nom' : '💾 Mettre à jour';
+            btn.innerHTML = locked ? icon('copy') + 'Dupliquer à mon nom' : icon('save') + 'Mettre à jour';
             document.getElementById('editingBadge').textContent = !current ? ''
-                : locked ? `🔒 Carte de ${current.ownerName || 'un ami'} — Toute sauvegarde créera une copie à votre nom`
-                : `✏️ Édition de « ${current.name || 'Sans nom'} »`;
+                : locked ? `Carte de ${current.ownerName || 'un ami'} — toute sauvegarde créera une copie à votre nom`
+                : `Édition de « ${current.name || 'Sans nom'} »`;
+            document.getElementById('editingBadge').classList.toggle('locked', locked);
             renderCollection();
         }
 
@@ -3772,8 +4468,8 @@
         let renderTimer = null;
 
         function setCloudIdle() {
-            if (realtimeLive) setCloudStatus('☁️ Connecté · temps réel', 'ok');
-            else setCloudStatus('☁️ Connecté à Supabase', 'ok');
+            setCloudStatus('En ligne', 'ok');
+            document.getElementById('cloudStatus').title = realtimeLive ? 'Synchronisation en temps réel active' : 'Connecté au cloud';
         }
 
         // Regroupe les rafraîchissements (un import de 30 cartes = 30 événements, 1 seul affichage)
@@ -3816,7 +4512,7 @@
             if (changedUnderMe) {
                 setTimeout(() => {
                     document.getElementById('editingBadge').textContent =
-                        `⚠️ « ${card.name || 'Sans nom'} » vient d'être modifiée par un autre joueur. Cliquez sur la carte dans la collection pour voir sa version, ou « Mettre à jour » pour garder la vôtre.`;
+                        `« ${card.name || 'Sans nom'} » vient d'être modifiée par un autre joueur. Cliquez sur la carte dans la collection pour voir sa version, ou « Mettre à jour » pour garder la vôtre.`;
                 }, 150);
             }
         }
@@ -3846,7 +4542,7 @@
                     } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                         realtimeLive = false;
                         realtimeHadError = true;
-                        setCloudStatus('⚠️ Temps réel interrompu, reconnexion…', 'error');
+                        setCloudStatus('Reconnexion…', 'error');
                     }
                 });
         }
@@ -3867,7 +4563,7 @@
                 return;
             }
             try {
-                const card = await withCloudStatus('⏳ Enregistrement…', async () => {
+                const card = await withCloudStatus('Enregistrement…', async () => {
                     const ready = await ensureCloudImage(readForm());
                     const { data, error } = await sb.from('cards')
                         .insert({ ...cardToRow(ready), owner_name: displayName(currentUser) })
@@ -3896,7 +4592,7 @@
                 return;
             }
             try {
-                const card = await withCloudStatus('⏳ Enregistrement…', async () => {
+                const card = await withCloudStatus('Enregistrement…', async () => {
                     const ready = await ensureCloudImage(readForm());
                     const { data, error } = await sb.from('cards')
                         .update(cardToRow(ready))
@@ -3937,7 +4633,7 @@
 
             if (isCloudActive()) {
                 try {
-                    await withCloudStatus('⏳ Suppression…', async () => {
+                    await withCloudStatus('Suppression…', async () => {
                         const { error } = await sb.from('cards').delete().eq('id', id);
                         if (error) throw error;
                     });
@@ -3964,7 +4660,7 @@
             if (!mine.length) return alert("Vous n'avez aucune carte à supprimer.");
             if (!confirm(`Supprimer définitivement VOS ${mine.length} cartes du cloud ?\n(Les cartes de vos amis ne sont pas touchées.)`)) return;
             try {
-                await withCloudStatus('⏳ Suppression…', async () => {
+                await withCloudStatus('Suppression…', async () => {
                     const { error } = await sb.from('cards').delete().eq('owner_id', currentUser.id);
                     if (error) throw error;
                 });
@@ -3980,7 +4676,7 @@
         async function insertCardsInCloud(cards) {
             const rows = [];
             for (let i = 0; i < cards.length; i++) {
-                setCloudStatus(`⏳ Envoi ${i + 1}/${cards.length}…`);
+                setCloudStatus(`Envoi ${i + 1}/${cards.length}…`);
                 const ready = await ensureCloudImage(cards[i]);
                 rows.push({ ...cardToRow(ready), owner_name: displayName(currentUser) });
             }
@@ -3994,7 +4690,7 @@
             const btn = document.getElementById('migrateBtn');
             const count = isCloudActive() ? readLocalCollection().length : 0;
             btn.hidden = count === 0;
-            btn.textContent = `☁️ Envoyer mes ${count} carte(s) locale(s) dans le cloud`;
+            btn.innerHTML = icon('cloud-upload') + `Envoyer mes ${count} carte(s) locale(s) dans le cloud`;
         }
 
         async function migrateLocalCards() {
@@ -4021,26 +4717,32 @@
         //  NAVIGATION PRINCIPALE : Créateur / Collection / Table de Jeu
         // =====================================================================
         function setMainView(view) {
+            closeAllDropdowns();
             if (view === 'collection') {
                 openBinder();
-                refreshNavHighlight();
                 return;
             }
-            closeBinder();
+            if (isBinderOpen()) closeBinder();
+            applyView(view);
+            // Le Studio est la "page d'accueil" : le bouton Retour d'Android y ramène
+            if (view === 'creator') closeLayer('view');
+            else pushLayer('view', () => applyView('creator'));
+        }
+
+        function applyView(view) {
             document.body.dataset.view = view;
             if (view === 'arena') {
-                if (document.body.dataset.mtab !== 'card' && document.body.dataset.mtab !== 'edit') document.body.dataset.mtab = 'card';
                 refreshLobby();
                 if (game) renderBoard();
             }
+            if (view === 'decks') renderDecksView();
             refreshNavHighlight();
         }
 
         function refreshNavHighlight() {
             const view = isBinderOpen() ? 'collection' : document.body.dataset.view;
             document.querySelectorAll('.main-tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-            const mtab = view === 'collection' ? 'collection' : view === 'arena' ? 'arena' : document.body.dataset.mtab;
-            highlightMobileTab(mtab);
+            document.querySelectorAll('#bottomTabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === view));
         }
 
         // =====================================================================
@@ -4069,6 +4771,7 @@
                 if (isCloudActive() && myDecks.length) saveDecks();
             }
             renderDeckSelect();
+            if (document.body.dataset.view === 'decks' && !deckEditorState) renderDeckGrid();
         }
 
         async function saveDecks() {
@@ -4094,75 +4797,188 @@
 
         let deckBuilderState = null;   // { id, selected: Set }
 
-        function openDeckBuilder(deckId) {
-            if (!collection.length) return alert("Votre collection est vide : créez d'abord des cartes.");
+        // ---------- Vue Decks ----------
+        let deckEditorState = null;   // { id, cardIds: [], dirty }
+
+        function renderDecksView() {
+            const note = document.getElementById('decksSyncNote');
+            note.textContent = isCloudActive()
+                ? 'Synchronisés entre vos appareils (PC, Android).'
+                : 'Hors ligne : enregistrés sur cet appareil uniquement.';
+            renderDeckGrid();
+            loadDecks();
+        }
+
+        function renderDeckGrid() {
+            const grid = document.getElementById('deckGrid');
+            grid.innerHTML = '';
+            if (!myDecks.length) {
+                grid.innerHTML = '<div class="empty-state">Aucun deck pour l\'instant. Créez-en un pour l\'utiliser dans l\'Arène.</div>';
+                return;
+            }
+            myDecks.forEach(deck => {
+                const box = document.createElement('article');
+                box.className = 'deck-box';
+                const cover = document.createElement('div');
+                cover.className = 'deck-cover';
+                const first = deck.cardIds.map(id => collection.find(c => c.id === id)).find(Boolean);
+                cover.appendChild(first ? makeMiniCard(first, 0.3) : makeBackMini(0.3));
+                const info = document.createElement('div');
+                info.className = 'deck-info';
+                const name = document.createElement('h3');
+                name.textContent = deck.name;
+                const count = document.createElement('span');
+                const missing = deck.cardIds.filter(id => !collection.some(c => c.id === id)).length;
+                count.textContent = `${deck.cardIds.length} carte${deck.cardIds.length > 1 ? 's' : ''}${missing ? ` (${missing} introuvable${missing > 1 ? 's' : ''})` : ''}`;
+                const actions = document.createElement('div');
+                actions.className = 'deck-actions';
+                actions.append(
+                    sheetButton('Modifier', () => openDeckEditor(deck.id), 'btn-secondary', 'pencil'),
+                    sheetButton('Dupliquer', () => duplicateDeck(deck.id), 'btn-secondary', 'copy'),
+                    sheetButton('Supprimer', () => deleteDeck(deck.id), 'btn-danger', 'trash-2')
+                );
+                info.append(name, count, actions);
+                box.append(cover, info);
+                grid.appendChild(box);
+            });
+        }
+
+        function openDeckEditor(deckId) {
             const deck = myDecks.find(d => d.id === deckId);
-            if (deckId && !deck) return alert('Choisissez un deck à modifier.');
-            deckBuilderState = { id: deck?.id || null, selected: new Set(deck?.cardIds || []) };
+            deckEditorState = { id: deck?.id || null, cardIds: [...(deck?.cardIds || [])], dirty: false };
             document.getElementById('deckNameInput').value = deck?.name || '';
             document.getElementById('deckSearchInput').value = '';
-            renderDeckBuilderList();
-            document.getElementById('deckModal').style.display = 'flex';
+            document.getElementById('decksListView').hidden = true;
+            document.getElementById('deckEditor').hidden = false;
+            pushLayer('deckEditor', hideDeckEditor);
+            renderDeckPool();
+            renderDeckContents();
         }
 
-        function renderDeckBuilderList() {
-            const list = document.getElementById('deckBuilderList');
+        function closeDeckEditor() {
+            if (deckEditorState?.dirty && !confirm('Quitter sans enregistrer les modifications du deck ?')) return;
+            if (!closeLayer('deckEditor')) hideDeckEditor();
+        }
+
+        function hideDeckEditor() {
+            deckEditorState = null;
+            document.getElementById('deckEditor').hidden = true;
+            document.getElementById('decksListView').hidden = false;
+            renderDeckGrid();
+        }
+
+        function deckCopies(cardId) {
+            return deckEditorState.cardIds.filter(id => id === cardId).length;
+        }
+
+        function renderDeckPool() {
+            const pool = document.getElementById('deckPool');
             const search = document.getElementById('deckSearchInput').value.trim().toLowerCase();
+            const type = document.getElementById('deckTypeFilter').value;
+            pool.innerHTML = '';
+            const cards = collection.filter(c =>
+                (!type || c.type === type) &&
+                (!search || `${c.name} ${c.subtype} ${c.ownerName || ''}`.toLowerCase().includes(search)));
+            if (!cards.length) {
+                pool.innerHTML = '<div class="empty-state">Aucune carte ne correspond.</div>';
+                return;
+            }
+            cards.forEach(card => {
+                const tile = document.createElement('button');
+                tile.type = 'button';
+                tile.className = 'pool-tile';
+                tile.dataset.id = card.id;
+                tile.title = 'Ajouter au deck';
+                tile.appendChild(makeMiniCard(card, isMobileLayout() ? 0.24 : 0.28));
+                const badge = document.createElement('span');
+                badge.className = 'pool-count';
+                tile.appendChild(badge);
+                tile.onclick = () => { deckEditorState.cardIds.push(card.id); deckEditorState.dirty = true; renderDeckContents(); };
+                pool.appendChild(tile);
+            });
+            refreshPoolCounts();
+        }
+
+        function refreshPoolCounts() {
+            document.querySelectorAll('#deckPool .pool-tile').forEach(tile => {
+                const n = deckCopies(tile.dataset.id);
+                const badge = tile.querySelector('.pool-count');
+                badge.textContent = n ? `×${n}` : '';
+                tile.classList.toggle('in-deck', n > 0);
+            });
+        }
+
+        function renderDeckContents() {
+            const list = document.getElementById('deckContents');
             list.innerHTML = '';
-            collection
-                .filter(c => !search || `${c.name} ${c.subtype} ${c.ownerName || ''}`.toLowerCase().includes(search))
-                .forEach(card => {
-                    const row = document.createElement('label');
-                    row.className = 'deck-row' + (deckBuilderState.selected.has(card.id) ? ' checked' : '');
-                    const box = document.createElement('input');
-                    box.type = 'checkbox';
-                    box.checked = deckBuilderState.selected.has(card.id);
-                    box.onchange = () => {
-                        if (box.checked) deckBuilderState.selected.add(card.id);
-                        else deckBuilderState.selected.delete(card.id);
-                        row.classList.toggle('checked', box.checked);
-                        updateDeckBuilderCount();
-                    };
-                    const info = document.createElement('div');
-                    info.className = 'deck-row-info';
-                    const name = document.createElement('strong');
-                    name.textContent = card.name || 'Sans nom';
-                    const meta = document.createElement('span');
-                    meta.textContent = `${TYPES[card.type] || ''} · ${RARITIES[card.rarity] || ''}${card.ownerName ? ' · ' + card.ownerName : ''}`;
-                    info.append(name, meta);
-                    row.append(box, makeMiniCard(card, 0.14), info);
-                    list.appendChild(row);
-                });
-            updateDeckBuilderCount();
+            const total = deckEditorState.cardIds.length;
+            document.getElementById('deckEditorCount').textContent = `${total} carte${total > 1 ? 's' : ''}`;
+            const ids = [...new Set(deckEditorState.cardIds)];
+            if (!ids.length) list.innerHTML = '<div class="empty-state">Deck vide : touchez des cartes de la collection pour les ajouter.</div>';
+            ids.forEach(id => {
+                const card = collection.find(c => c.id === id);
+                const row = document.createElement('div');
+                row.className = 'deck-line' + (card ? '' : ' missing');
+                if (card) row.appendChild(makeMiniCard(card, 0.1));
+                const info = document.createElement('div');
+                info.className = 'deck-line-info';
+                const name = document.createElement('strong');
+                name.textContent = card ? (card.name || 'Sans nom') : 'Carte supprimée';
+                const meta = document.createElement('span');
+                meta.textContent = card ? `${TYPES[card.type] || ''} · coût ${card.mana}` : 'Retirez-la du deck';
+                info.append(name, meta);
+                const qty = document.createElement('div');
+                qty.className = 'qty';
+                const n = document.createElement('span');
+                n.textContent = `×${deckCopies(id)}`;
+                qty.append(
+                    sheetButton('', () => { const i = deckEditorState.cardIds.lastIndexOf(id); deckEditorState.cardIds.splice(i, 1); deckEditorState.dirty = true; renderDeckContents(); }, 'btn-secondary btn-icon', 'minus'),
+                    n,
+                    sheetButton('', () => { if (!card) return; deckEditorState.cardIds.push(id); deckEditorState.dirty = true; renderDeckContents(); }, 'btn-secondary btn-icon', 'plus')
+                );
+                row.append(info, qty);
+                list.appendChild(row);
+            });
+            refreshPoolCounts();
         }
 
-        function updateDeckBuilderCount() {
-            const n = deckBuilderState.selected.size;
-            document.getElementById('deckBuilderCount').textContent = `${n} carte${n > 1 ? 's' : ''}`;
-        }
-
-        async function saveDeckFromBuilder() {
+        async function saveDeckFromEditor() {
             const name = document.getElementById('deckNameInput').value.trim();
             if (!name) return alert('Donnez un nom à votre deck.');
-            if (!deckBuilderState.selected.size) return alert('Cochez au moins une carte.');
-            const deck = { id: deckBuilderState.id || 'deck_' + Date.now(), name, cardIds: [...deckBuilderState.selected] };
+            if (!deckEditorState.cardIds.length) return alert('Ajoutez au moins une carte.');
+            const deck = { id: deckEditorState.id || 'deck_' + Date.now(), name, cardIds: [...deckEditorState.cardIds] };
             const idx = myDecks.findIndex(d => d.id === deck.id);
             if (idx === -1) myDecks.push(deck); else myDecks[idx] = deck;
-            closeModal('deckModal');
+            deckEditorState.dirty = false;
             renderDeckSelect();
-            document.getElementById('deckSelect').value = deck.id;
-            document.querySelector('input[name=deckMode][value=custom]').checked = true;
+            closeDeckEditor();
             await saveDecks();
         }
 
-        async function deleteDeck() {
-            const id = document.getElementById('deckSelect').value;
+        async function duplicateDeck(id) {
+            const deck = myDecks.find(d => d.id === id);
+            if (!deck) return;
+            myDecks.push({ id: 'deck_' + Date.now(), name: `${deck.name} (copie)`, cardIds: [...deck.cardIds] });
+            renderDeckGrid();
+            renderDeckSelect();
+            await saveDecks();
+        }
+
+        async function deleteDeck(id) {
             const deck = myDecks.find(d => d.id === id);
             if (!deck || !confirm(`Supprimer le deck « ${deck.name} » ?`)) return;
             myDecks = myDecks.filter(d => d.id !== id);
+            renderDeckGrid();
             renderDeckSelect();
             await saveDecks();
         }
+
+
+
+
+
+
+
 
         // =====================================================================
         //  TABLE DE JEU : état local + salon Supabase Realtime (presence + broadcast)
@@ -4201,14 +5017,14 @@
 
         function refreshLobby() {
             const notice = document.getElementById('lobbyNotice');
-            notice.textContent = isCloudActive() ? '' : '🔒 Connectez-vous (compte Supabase) pour jouer en ligne avec vos amis.';
+            notice.textContent = isCloudActive() ? '' : 'Connectez-vous (compte Supabase) pour jouer en ligne avec vos amis.';
             document.getElementById('myCardsCount').textContent = collection.filter(isOwnCard).length;
             document.getElementById('randomDeckSize').max = Math.max(5, collection.length);
             loadDecks();
             const saved = readSavedGame();
             const resume = document.getElementById('resumeBtn');
             resume.hidden = !(saved && saved.userId === myId());
-            if (!resume.hidden) resume.textContent = `↩️ Reprendre la partie en cours (salon ${saved.room})`;
+            if (!resume.hidden) resume.innerHTML = icon('undo-2') + `Reprendre la partie en cours (salon ${saved.room})`;
             const inGame = !!gameChannel;
             document.getElementById('arenaLobby').hidden = inGame;
             document.getElementById('arenaGame').hidden = !inGame;
@@ -4287,6 +5103,7 @@
             attackMode = null;
             saveGameLocal();
             connectRoom();
+            pushLayer('game', doLeaveTable);
             refreshLobby();
             renderBoard();
         }
@@ -4309,7 +5126,7 @@
                     await gameChannel.track({ userId: myId(), name: game.name, joinedAt: game.joinedAt });
                     gameChannel.send({ type: 'broadcast', event: 'request_state', payload: {} });
                     sendState();
-                    logAction(`🍺 ${game.name} s'installe à la table.`);
+                    logAction(`${game.name} s'installe à la table.`, 'beer');
                 });
         }
 
@@ -4321,8 +5138,13 @@
             gameChannel = null;
         }
 
+        // Retour au lobby (bouton, ou geste Retour d'Android) : la partie reste sauvegardée
         function leaveTable() {
-            if (gameChannel) logAction(`🚪 ${game.name} quitte la table (partie sauvegardée).`);
+            if (!closeLayer('game')) doLeaveTable();
+        }
+
+        function doLeaveTable() {
+            if (gameChannel) logAction(`${game.name} quitte la table (partie sauvegardée).`, 'door-open');
             disconnectRoom();
             closeActionSheet();
             refreshLobby();
@@ -4335,7 +5157,7 @@
             fresh.log = game.log;
             game = fresh;
             closeActionSheet();
-            logAction(`♻️ ${game.name} recommence avec un nouveau deck mélangé.`);
+            logAction(`${game.name} recommence avec un nouveau deck mélangé.`, 'rotate-ccw');
             sendState();
         }
 
@@ -4350,7 +5172,7 @@
             const [p1, p2] = arenaPresence;
             if (p1 && p2 && p1.userId === myId() && !game.turn) {
                 game.turn = { userId: p1.userId, number: 1, started: false, at: Date.now() };
-                logAction(`🎮 La partie commence ! ${p1.name} joue en premier.`);
+                logAction(`La partie commence ! ${p1.name} joue en premier.`, 'flag');
             }
             sendState();
             renderBoard();
@@ -4412,8 +5234,8 @@
             renderLog();
         }
 
-        function logAction(text) {
-            const entry = { text, at: Date.now() };
+        function logAction(text, kind = 'info') {
+            const entry = { text, kind, at: Date.now() };
             pushLog(entry);
             if (gameChannel) gameChannel.send({ type: 'broadcast', event: 'game_log', payload: entry });
         }
@@ -4425,6 +5247,7 @@
                 const li = document.createElement('li');
                 const time = document.createElement('time');
                 time.textContent = new Date(e.at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                li.insertAdjacentHTML('beforeend', icon(e.kind || 'info', 14));
                 li.append(time, document.createTextNode(e.text));
                 list.appendChild(li);
             });
@@ -4467,27 +5290,27 @@
             const inst = game.deck.shift();
             game.hand.push(inst);
             lastDrawnUid = inst.uid;
-            logAction(`🂠 ${game.name} pioche une carte (${game.deck.length} restante${game.deck.length > 1 ? 's' : ''}).`);
+            logAction(`${game.name} pioche une carte (${game.deck.length} restante${game.deck.length > 1 ? 's' : ''}).`, 'layers');
             sendState();
         }
 
         function shuffleMyDeck() {
             if (!game.deck.length) return;
             game.deck = shuffle(game.deck);
-            logAction(`🔄 ${game.name} mélange sa pioche.`);
+            logAction(`${game.name} mélange sa pioche.`, 'shuffle');
             sendState();
         }
 
         function rollDice(faces) {
             const value = 1 + Math.floor(Math.random() * faces);
-            logAction(`🎲 ${game.name} lance 1d${faces} : ${value}${value === faces ? ' ✨' : ''}`);
+            logAction(`${game.name} lance 1d${faces} : ${value}${value === faces ? ' (maximum !)' : ''}`, 'dices');
         }
 
         function startMyTurn() {
             if (!isMyTurn()) return;
             [...game.field, game.land].forEach(i => { if (i) i.tapped = false; });
             game.turn = { ...game.turn, started: true, at: Date.now() };
-            logAction(`▶️ ${game.name} débute son tour ${game.turn.number} (cartes redressées).`);
+            logAction(`${game.name} débute son tour ${game.turn.number} (cartes redressées).`, 'play');
             sendState();
         }
 
@@ -4498,7 +5321,7 @@
             const nextName = opponents[next]?.name || arenaPresence.find(p => p.userId === next)?.name || 'adversaire';
             game.turn = { userId: next, number: game.turn.number + 1, started: false, at: Date.now() };
             closeActionSheet();
-            logAction(`⏭️ ${game.name} termine son tour. À ${nextName} de jouer !`);
+            logAction(`${game.name} termine son tour. À ${nextName} de jouer !`, 'skip-forward');
             sendState();
         }
 
@@ -4516,7 +5339,7 @@
             if (inst.card.type === 'land') {
                 if (game.land) {
                     game.graveyard.push({ ...game.land, tapped: false });
-                    logAction(`🌍 ${game.land.card.name} est remplacé et part au cimetière.`);
+                    logAction(`${game.land.card.name} est remplacé et part au cimetière.`, 'mountain');
                 }
                 game.land = inst;
             } else {
@@ -4526,7 +5349,7 @@
             }
             game.hand.splice(idx, 1);
             closeActionSheet();
-            logAction(`▶️ ${game.name} pose ${inst.card.name || 'une carte'} (coût ${inst.card.mana}).`);
+            logAction(`${game.name} pose ${inst.card.name || 'une carte'} (coût ${inst.card.mana}).`, 'play');
             sendState();
         }
 
@@ -4536,7 +5359,7 @@
             const [inst] = game.hand.splice(idx, 1);
             game.graveyard.push(inst);
             closeActionSheet();
-            logAction(`💀 ${game.name} défausse ${inst.card.name}.`);
+            logAction(`${game.name} défausse ${inst.card.name}.`, 'skull');
             sendState();
         }
 
@@ -4559,7 +5382,7 @@
             if (!inst) return;
             game.graveyard.push({ ...inst, tapped: false });
             closeActionSheet();
-            logAction(`💀 ${inst.card.name} est envoyé au cimetière.`);
+            logAction(`${inst.card.name} est envoyé au cimetière.`, 'skull');
             sendState();
         }
 
@@ -4568,7 +5391,7 @@
             if (!inst) return;
             game.hand.push({ ...inst, tapped: false, curHp: inst.maxHp });
             closeActionSheet();
-            logAction(`✋ ${inst.card.name} retourne dans la main de ${game.name}.`);
+            logAction(`${inst.card.name} retourne dans la main de ${game.name}.`, 'hand');
             sendState();
         }
 
@@ -4576,7 +5399,7 @@
             const inst = findMyInstance(uid);
             if (!inst) return;
             inst.tapped = !inst.tapped;
-            logAction(inst.tapped ? `🔄 ${inst.card.name} est engagé.` : `↩️ ${inst.card.name} est redressé.`);
+            logAction(inst.tapped ? `${inst.card.name} est engagé.` : `${inst.card.name} est redressé.`, inst.tapped ? 'rotate-cw' : 'undo-2');
             selectArenaCard(myId(), uid, 'field');
             sendState();
         }
@@ -4587,14 +5410,14 @@
                 const inst = findMyInstance(uid);
                 if (!inst || inst.maxHp == null) return;
                 inst.curHp = Math.max(0, inst.curHp + delta);
-                logAction(`❤️ ${inst.card.name} : ${delta > 0 ? '+' : ''}${delta} PV (${inst.curHp}/${inst.maxHp}).`);
+                logAction(`${inst.card.name} : ${delta > 0 ? '+' : ''}${delta} PV (${inst.curHp}/${inst.maxHp}).`, 'heart');
                 sendState();
             } else {
                 const inst = findOpponentInstance(owner, uid);
                 if (!inst || inst.maxHp == null) return;
                 inst.curHp = Math.max(0, inst.curHp + delta);   // affichage immédiat, confirmé par le propriétaire
                 sendCardAction(owner, { uid, kind: 'card_hp', delta });
-                logAction(`❤️ ${inst.card.name} (${opponents[owner]?.name}) : ${delta > 0 ? '+' : ''}${delta} PV.`);
+                logAction(`${inst.card.name} (${opponents[owner]?.name}) : ${delta > 0 ? '+' : ''}${delta} PV.`, 'heart');
                 renderBoard();
             }
             selectArenaCard(owner, uid, 'field');
@@ -4611,7 +5434,7 @@
             if (idx === -1) return;
             const [inst] = game.graveyard.splice(idx, 1);
             game.hand.push({ ...inst, tapped: false, curHp: inst.maxHp });
-            logAction(`↩️ ${game.name} récupère ${inst.card.name} du cimetière.`);
+            logAction(`${game.name} récupère ${inst.card.name} du cimetière.`, 'undo-2');
             sendState();
             openGraveyard(myId());
         }
@@ -4623,7 +5446,7 @@
             if (!spell) return;
             const dmg = parseInt(spell.dmg, 10);
             if (!Number.isFinite(dmg) || dmg <= 0) {
-                logAction(`✨ ${inst.card.name} utilise ${spell.name}${spell.text ? ' : ' + spell.text : ''}`);
+                logAction(`${inst.card.name} utilise ${spell.name}${spell.text ? ' : ' + spell.text : ''}`, 'sparkles');
                 return closeActionSheet();
             }
             attackMode = { sourceUid, spell: spell.name, dmg, cardName: inst.card.name };
@@ -4646,7 +5469,7 @@
             closeActionSheet();
             renderBoard();
             flashHit(targetUid ? document.querySelector(`#rowOpp [data-uid="${targetUid}"]`) : document.getElementById('barOpp'));
-            logAction(`⚔️ ${a.cardName} utilise ${a.spell} sur ${targetName || 'la cible'} (-${a.dmg} PV) !`);
+            logAction(`${a.cardName} utilise ${a.spell} sur ${targetName || 'la cible'} (-${a.dmg} PV) !`, 'swords');
         }
 
         function flashHit(el) {
@@ -4665,7 +5488,8 @@
             const width = board.clientWidth - 32;
             const cols = width < 620 ? 3 : 6;
             const slotScale = Math.max(0.13, Math.min(0.3, (width - (cols - 1) * 8) / cols / 375));
-            const handScale = Math.max(0.2, Math.min(0.28, slotScale * 1.05));
+            // Main un peu plus grande que le terrain : plus facile à lire et à toucher
+            const handScale = Math.max(0.27, Math.min(0.33, slotScale * 1.15));
             const root = document.documentElement.style;
             root.setProperty('--slot-w', `${Math.round(375 * slotScale)}px`);
             root.setProperty('--slot-h', `${Math.round(523 * slotScale)}px`);
@@ -4727,7 +5551,7 @@
                 const isLand = i === ARENA_FRONT_SLOTS;
                 slot.className = 'slot' + (isLand ? ' land-slot' : '');
                 if (!inst) {
-                    slot.textContent = isLand ? '🌍 Terrain actif' : `Emplacement ${i + 1}`;
+                    slot.innerHTML = isLand ? icon('mountain', 18) + '<span>Terrain actif</span>' : `<span>Emplacement ${i + 1}</span>`;
                 } else {
                     slot.appendChild(renderTableCard(inst, owner, scales.slotScale, 'field'));
                 }
@@ -4744,7 +5568,7 @@
             if (inst.maxHp != null) {
                 const hp = document.createElement('span');
                 hp.className = 'hp-badge';
-                hp.textContent = `❤️ ${inst.curHp} / ${inst.maxHp}`;
+                hp.innerHTML = icon('heart', 12) + `${inst.curHp} / ${inst.maxHp}`;
                 el.appendChild(hp);
             }
             if (inst.tapped) {
@@ -4761,11 +5585,13 @@
             return el;
         }
 
-        function statChip(label, value, buttons) {
+        function statChip(iconName, value, buttons, title) {
             const chip = document.createElement('span');
             chip.className = 'stat-chip';
+            if (title) chip.title = title;
             const text = document.createElement('span');
-            text.textContent = `${label} ${value}`;
+            text.className = 'stat-value';
+            text.innerHTML = icon(iconName, 14) + value;
             (buttons || []).forEach(([txt, fn], i) => {
                 const b = document.createElement('button');
                 b.type = 'button';
@@ -4782,29 +5608,30 @@
             const bar = document.getElementById(barId);
             bar.innerHTML = '';
             if (!state) {
-                bar.innerHTML = `<span class="player-name offline">⏳ En attente d'un adversaire… (salon ${game.room})</span>`;
+                bar.innerHTML = `<span class="player-name offline">${icon('hourglass', 15)}En attente d'un adversaire… (salon ${escapeHtml(game.room)})</span>`;
                 return;
             }
             const online = arenaPresence.some(p => p.userId === state.userId) || state.mine;
             const name = document.createElement('span');
             name.className = 'player-name' + (online ? '' : ' offline');
-            name.textContent = (state.mine ? '🧙 ' : '👤 ') + state.name + (online ? '' : ' (déconnecté)');
+            name.innerHTML = icon(state.mine ? 'user-round' : 'swords', 15);
+            name.appendChild(document.createTextNode(state.name + (online ? '' : ' (déconnecté)')));
             bar.appendChild(name);
             if (!state.mine) {
                 name.onclick = () => { if (attackMode) resolveAttack(state.userId, null); };
             }
 
             if (interactive) {
-                bar.appendChild(statChip('❤️', state.hp, [
+                bar.appendChild(statChip('heart', state.hp, [
                     ['-10', () => changeMyStat('hp', -10)], ['-1', () => changeMyStat('hp', -1)],
                     ['+1', () => changeMyStat('hp', 1)], ['+10', () => changeMyStat('hp', 10)]
                 ]));
-                bar.appendChild(statChip('💧', `${state.mana}/${ARENA_MAX_MANA}`, [
+                bar.appendChild(statChip('droplet', `${state.mana}/${ARENA_MAX_MANA}`, [
                     ['-', () => changeMyStat('mana', -1)], ['+', () => changeMyStat('mana', 1)]
                 ]));
             } else {
-                bar.appendChild(statChip('❤️', state.hp));
-                bar.appendChild(statChip('💧', `${state.mana}/${ARENA_MAX_MANA}`));
+                bar.appendChild(statChip('heart', state.hp, null, 'Points de vie'));
+                bar.appendChild(statChip('droplet', `${state.mana}/${ARENA_MAX_MANA}`, null, 'Mana'));
             }
 
             // Pioche (verso TCGBP) : un clic pioche la carte du dessus
@@ -4827,7 +5654,7 @@
             grave.appendChild(top ? makeMiniCard(top.card, scales.backScale) : makeBackMini(scales.backScale));
             const gc = document.createElement('span');
             gc.className = 'pile-count';
-            gc.textContent = `💀 ${state.graveyard.length}`;
+            gc.innerHTML = icon('skull', 13) + state.graveyard.length;
             grave.appendChild(gc);
             grave.onclick = () => openGraveyard(state.userId);
             bar.appendChild(grave);
@@ -4840,7 +5667,7 @@
                 for (let i = 0; i < shown; i++) hand.appendChild(makeBackMini(scales.backScale * 0.8));
                 const more = document.createElement('span');
                 more.className = 'more';
-                more.textContent = `✋ ${state.handCount}`;
+                more.innerHTML = icon('hand', 14) + state.handCount;
                 hand.appendChild(more);
                 bar.appendChild(hand);
             }
@@ -4850,29 +5677,46 @@
             const handEl = document.getElementById('handMe');
             handEl.innerHTML = '';
             if (!interactive) {
-                handEl.innerHTML = '<span class="hand-empty">👀 Vous regardez la partie en spectateur.</span>';
+                handEl.innerHTML = `<span class="hand-empty">${icon('eye', 15)}Vous regardez la partie en spectateur.</span>`;
                 return;
             }
             if (!game.hand.length) {
-                handEl.innerHTML = '<span class="hand-empty">Main vide : cliquez sur votre pioche pour piocher.</span>';
+                handEl.innerHTML = '<span class="hand-empty">Main vide : touchez votre pioche pour piocher.</span>';
                 return;
             }
             game.hand.forEach(inst => {
+                const selected = arenaSelection?.zone === 'hand' && arenaSelection.uid === inst.uid;
                 const el = document.createElement('div');
-                el.className = 'hand-card' + (arenaSelection?.uid === inst.uid ? ' selected' : '') + (inst.uid === lastDrawnUid ? ' just-drawn' : '');
+                el.className = 'hand-card' + (selected ? ' selected' : '') + (inst.uid === lastDrawnUid ? ' just-drawn' : '');
                 el.dataset.uid = inst.uid;
                 el.appendChild(makeMiniCard(inst.card, scales.handScale));
-                el.onclick = e => { e.stopPropagation(); selectArenaCard(myId(), inst.uid, 'hand'); };
+                // 1er tap : la carte se soulève et propose Poser / Zoom, sans rien masquer
+                if (selected) {
+                    const quick = document.createElement('div');
+                    quick.className = 'hand-quick';
+                    quick.append(
+                        sheetButton('Poser', () => playFromHand(inst.uid), 'btn-new-card', 'play'),
+                        sheetButton('Zoom', () => zoomCard(inst), 'btn-secondary', 'zoom-in')
+                    );
+                    el.appendChild(quick);
+                }
+                el.onclick = e => {
+                    e.stopPropagation();
+                    if (selected) return closeActionSheet();
+                    selectArenaCard(myId(), inst.uid, 'hand');
+                };
                 handEl.appendChild(el);
             });
             lastDrawnUid = null;
+            const sel = handEl.querySelector('.hand-card.selected');
+            if (sel) sel.scrollIntoView({ block: 'nearest', inline: 'nearest' });
         }
 
         function renderTurn(roles) {
             const el = document.getElementById('turnIndicator');
             const t = game.turn;
             if (!t) {
-                el.textContent = roles.players.length < 2 ? "⏳ En attente d'un 2e joueur" : '⏳ Préparation…';
+                el.textContent = roles.players.length < 2 ? "En attente d'un 2e joueur" : 'Préparation…';
                 el.classList.remove('mine');
             } else {
                 const name = t.userId === myId() ? game.name : (opponents[t.userId]?.name || arenaPresence.find(p => p.userId === t.userId)?.name || '?');
@@ -4910,26 +5754,32 @@
         function selectArenaCard(owner, uid, zone) {
             arenaSelection = { owner, uid, zone };
             if (attackMode && owner === myId()) attackMode = null;
+            // Le geste Retour d'Android ferme la sélection au lieu de quitter la table
+            pushLayer('sheet', () => closeActionSheet(true));
             renderBoard();
             renderActionSheet();
         }
 
-        function closeActionSheet() {
+        function closeActionSheet(fromHistory = false) {
+            if (!fromHistory && closeLayer('sheet')) return;
             arenaSelection = null;
             attackMode = null;
             document.getElementById('actionSheet').hidden = true;
             renderBoard();
         }
 
-        function sheetButton(label, fn, extraClass = 'btn-secondary') {
+        function sheetButton(label, fn, extraClass = 'btn-secondary', iconName = null) {
             const b = document.createElement('button');
             b.type = 'button';
             b.className = `btn btn-small ${extraClass}`;
-            b.textContent = label;
+            if (iconName) b.insertAdjacentHTML('beforeend', icon(iconName, 15));
+            if (label) b.appendChild(document.createTextNode(label));
+            else if (iconName) b.setAttribute('aria-label', iconName);
             b.onclick = e => { e.stopPropagation(); fn(); };
             return b;
         }
 
+        // Barre d'actions contextuelle : entre ma ligne de front et ma main, jamais par-dessus la main
         function renderActionSheet() {
             const sheet = document.getElementById('actionSheet');
             sheet.innerHTML = '';
@@ -4938,110 +5788,101 @@
             if (attackMode) {
                 const title = document.createElement('div');
                 title.className = 'sheet-title';
-                title.textContent = `🎯 ${attackMode.cardName} — ${attackMode.spell} (-${attackMode.dmg} PV) : touchez une carte adverse ou le nom de l'adversaire`;
+                title.innerHTML = icon('crosshair', 16);
+                title.appendChild(document.createTextNode(
+                    `${attackMode.cardName} — ${attackMode.spell} (-${attackMode.dmg} PV) : touchez une carte adverse ou le nom de l'adversaire`));
                 const row = document.createElement('div');
                 row.className = 'sheet-row';
-                row.appendChild(sheetButton('Annuler', () => { attackMode = null; renderBoard(); renderActionSheet(); }));
+                row.appendChild(sheetButton('Annuler', () => { attackMode = null; renderBoard(); renderActionSheet(); }, 'btn-secondary', 'x'));
                 sheet.append(title, row);
                 sheet.hidden = false;
                 return;
             }
-            if (!sel) { sheet.hidden = true; return; }
+            // Main : actions rapides directement sur la carte, pas de barre
+            if (!sel || sel.zone === 'hand') { sheet.hidden = true; return; }
 
             const mine = sel.owner === myId();
-            const inst = sel.zone === 'hand'
-                ? game.hand.find(i => i.uid === sel.uid)
-                : (mine ? findMyInstance(sel.uid) : findOpponentInstance(sel.owner, sel.uid));
+            const inst = mine ? findMyInstance(sel.uid) : findOpponentInstance(sel.owner, sel.uid);
             if (!inst) { sheet.hidden = true; return; }
 
             const title = document.createElement('div');
             title.className = 'sheet-title';
             const label = document.createElement('span');
             label.textContent = `${inst.card.name || 'Sans nom'}${mine ? '' : ` (${opponents[sel.owner]?.name || 'adversaire'})`}`;
-            title.append(label, sheetButton('✕', closeActionSheet));
+            const close = sheetButton('', () => closeActionSheet(), 'btn-ghost btn-icon', 'x');
+            close.setAttribute('aria-label', 'Fermer');
+            title.append(label, close);
             sheet.appendChild(title);
 
             const canAct = arenaRoles().amPlayer;
+            if (inst.maxHp != null && canAct) {
+                const hpRow = document.createElement('div');
+                hpRow.className = 'sheet-row';
+                const l = document.createElement('span');
+                l.className = 'sheet-label';
+                l.innerHTML = icon('heart', 14) + `${inst.curHp} / ${inst.maxHp}`;
+                hpRow.appendChild(l);
+                [-10, -5, 5, 10].forEach(d => hpRow.appendChild(sheetButton(`${d > 0 ? '+' : ''}${d}`, () => adjustCardHp(sel.owner, inst.uid, d))));
+                sheet.appendChild(hpRow);
+            }
+
             const row = document.createElement('div');
             row.className = 'sheet-row';
-
-            if (sel.zone === 'hand') {
+            if (mine && canAct) {
+                inst.card.spells.forEach((s, i) => {
+                    if (!s.name) return;
+                    const dmg = parseInt(s.dmg, 10);
+                    const hasDmg = Number.isFinite(dmg) && dmg > 0;
+                    row.appendChild(sheetButton(hasDmg ? `${s.name} (${dmg})` : s.name,
+                        () => startAttack(inst.uid, i), hasDmg ? 'btn-spell' : 'btn-spell no-dmg', hasDmg ? 'swords' : 'sparkles'));
+                });
                 row.append(
-                    sheetButton('▶️ Poser sur le terrain', () => playFromHand(inst.uid), 'btn-new-card'),
-                    sheetButton('👁️ Zoomer', () => zoomCard(inst)),
-                    sheetButton('💀 Défausser', () => discardFromHand(inst.uid))
+                    sheetButton(inst.tapped ? 'Redresser' : 'Tap', () => toggleTap(inst.uid), 'btn-secondary', inst.tapped ? 'undo-2' : 'rotate-cw'),
+                    sheetButton('Cimetière', () => sendToGraveyard(inst.uid), 'btn-secondary', 'skull'),
+                    sheetButton('Main', () => returnToHand(inst.uid), 'btn-secondary', 'hand')
                 );
-                sheet.appendChild(row);
-            } else {
-                // PV rapides (mes cartes, ou celles de l'adversaire en mode bac à sable)
-                if (inst.maxHp != null && canAct) {
-                    const hpRow = document.createElement('div');
-                    hpRow.className = 'sheet-row';
-                    const l = document.createElement('span');
-                    l.className = 'sheet-label';
-                    l.textContent = `❤️ ${inst.curHp} / ${inst.maxHp}`;
-                    hpRow.appendChild(l);
-                    [-10, -5, 5, 10].forEach(d => hpRow.appendChild(sheetButton(`${d > 0 ? '+' : ''}${d}`, () => adjustCardHp(sel.owner, inst.uid, d))));
-                    sheet.appendChild(hpRow);
-                }
-                // Sorts / effets de ma carte = boutons d'action
-                if (mine && canAct) {
-                    const spells = inst.card.spells.filter(s => s.name);
-                    if (spells.length) {
-                        const spellRow = document.createElement('div');
-                        spellRow.className = 'sheet-row';
-                        inst.card.spells.forEach((s, i) => {
-                            if (!s.name) return;
-                            const dmg = parseInt(s.dmg, 10);
-                            const hasDmg = Number.isFinite(dmg) && dmg > 0;
-                            spellRow.appendChild(sheetButton(hasDmg ? `⚔️ ${s.name} (${dmg})` : `✨ ${s.name}`,
-                                () => startAttack(inst.uid, i), hasDmg ? 'btn-spell' : 'btn-spell no-dmg'));
-                        });
-                        sheet.appendChild(spellRow);
-                    }
-                    row.append(
-                        sheetButton(inst.tapped ? '↩️ Redresser' : '🔄 Tap', () => toggleTap(inst.uid)),
-                        sheetButton('💀 Cimetière', () => sendToGraveyard(inst.uid)),
-                        sheetButton('✋ Main', () => returnToHand(inst.uid))
-                    );
-                }
-                row.appendChild(sheetButton('🔍 Zoom', () => zoomCard(inst)));
-                sheet.appendChild(row);
             }
+            row.appendChild(sheetButton('Zoom', () => zoomCard(inst), 'btn-secondary', 'zoom-in'));
+            sheet.appendChild(row);
             sheet.hidden = false;
         }
 
         // Toucher le tapis à côté d'une carte ferme la feuille d'actions
         document.addEventListener('click', e => {
             if (!game || document.body.dataset.view !== 'arena') return;
-            if (e.target.closest('#actionSheet, .slot-card, .hand-card, .player-bar, .center-bar, .arena-sidebar, .modal-overlay, header, .bottom-tabs')) return;
+            if (e.target.closest('#actionSheet, .slot-card, .hand-card, .hand, .player-bar, .center-bar, .arena-topbar, .arena-sidebar, .modal-overlay, header, .bottom-tabs')) return;
             if (arenaSelection || attackMode) closeActionSheet();
         });
 
         // ---------- Zoom & cimetière ----------
         function zoomCard(inst) {
             const box = document.getElementById('zoomBox');
-            const scale = Math.min(1, (window.innerHeight - 140) / 523, (window.innerWidth - 40) / 375);
+            const scale = Math.min(1, (window.innerHeight - 190) / 523, (window.innerWidth - 40) / 375);
             box.replaceChildren(makeMiniCard(inst.card, scale));
             if (inst.maxHp != null) {
                 const hp = document.createElement('div');
                 hp.className = 'zoom-hp';
-                hp.textContent = `❤️ PV en jeu : ${inst.curHp} / ${inst.maxHp}`;
+                hp.innerHTML = icon('heart', 16) + `PV en jeu : ${inst.curHp} / ${inst.maxHp}`;
                 box.appendChild(hp);
             }
-            const close = document.createElement('button');
-            close.className = 'btn btn-secondary';
-            close.textContent = 'Fermer';
-            close.onclick = () => closeModal('zoomModal');
-            box.appendChild(close);
-            document.getElementById('zoomModal').style.display = 'flex';
+            // Carte de ma main : on peut la poser ou la défausser depuis le zoom
+            if (game?.hand.some(i => i.uid === inst.uid) && arenaRoles().amPlayer) {
+                const row = document.createElement('div');
+                row.className = 'sheet-row';
+                row.append(
+                    sheetButton('Poser sur le terrain', () => { closeModal('zoomModal'); playFromHand(inst.uid); }, 'btn-new-card', 'play'),
+                    sheetButton('Défausser', () => { closeModal('zoomModal'); discardFromHand(inst.uid); }, 'btn-secondary', 'skull')
+                );
+                box.appendChild(row);
+            }
+            openModal('zoomModal');
         }
 
         function openGraveyard(owner) {
             const mine = owner === myId();
             const state = mine ? game : opponents[owner];
             if (!state) return;
-            document.getElementById('graveTitle').textContent = `💀 Cimetière de ${mine ? 'vous' : state.name} (${state.graveyard.length})`;
+            document.getElementById('graveTitle').textContent = `Cimetière de ${mine ? 'vous' : state.name} (${state.graveyard.length})`;
             const grid = document.getElementById('graveGrid');
             grid.innerHTML = '';
             if (!state.graveyard.length) grid.innerHTML = '<div class="grave-empty">Aucune carte détruite pour l\'instant.</div>';
@@ -5052,10 +5893,10 @@
                 card.style.cursor = 'zoom-in';
                 card.onclick = () => zoomCard(inst);
                 item.appendChild(card);
-                if (mine && arenaRoles().amPlayer) item.appendChild(sheetButton('↩️ Récupérer en main', () => recoverFromGraveyard(inst.uid)));
+                if (mine && arenaRoles().amPlayer) item.appendChild(sheetButton('Récupérer en main', () => recoverFromGraveyard(inst.uid), 'btn-secondary', 'undo-2'));
                 grid.appendChild(item);
             });
-            document.getElementById('graveModal').style.display = 'flex';
+            openModal('graveModal');
         }
 
         document.addEventListener('keydown', e => {
@@ -5134,6 +5975,7 @@
 
             overlay.classList.remove('closing');
             overlay.hidden = false;
+            pushLayer('whatsnew', finishWhatsNew);
             goToWhatsNew(0);
             clearTimeout(wnTimer);
             if (!reduced) {
@@ -5152,7 +5994,7 @@
             document.querySelectorAll('#wnDots button').forEach((d, k) => d.classList.toggle('active', k === wnIndex));
             const last = wnIndex === slides.length - 1;
             const next = document.getElementById('wnNext');
-            next.textContent = last ? '🍺 Entrer dans la Taverne !' : 'Suivant →';
+            next.innerHTML = last ? icon('beer', 18) + 'Entrer dans la Taverne' : 'Suivant' + icon('arrow-right', 16);
             next.classList.toggle('final', last);
         }
 
@@ -5162,7 +6004,11 @@
             else goToWhatsNew(wnIndex + 1);
         }
 
-        async function closeWhatsNew() {
+        function closeWhatsNew() {
+            if (!closeLayer('whatsnew')) finishWhatsNew();
+        }
+
+        async function finishWhatsNew() {
             const overlay = document.getElementById('whatsNew');
             if (overlay.hidden) return;
             clearTimeout(wnTimer);
@@ -5204,6 +6050,83 @@
             });
         })();
 
+        // =====================================================================
+        //  ICÔNES (Lucide) : <i data-lucide> dans le HTML, icon('nom') dans le JS
+        // =====================================================================
+        function icon(name, size = 16) {
+            const key = name.replace(/(^|-)(\w)/g, (_, __, c) => c.toUpperCase());
+            const node = window.lucide?.icons?.[key];
+            if (!node) return '';
+            return window.lucide.createElement(node, { width: size, height: size, 'aria-hidden': 'true', class: `lucide lucide-${name}` }).outerHTML;
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        // ---------- Menus déroulants (Outils, Exporter) ----------
+        function toggleDropdown(id, event) {
+            event?.stopPropagation();
+            const dd = document.getElementById(id);
+            const open = !dd.classList.contains('open');
+            closeAllDropdowns();
+            dd.classList.toggle('open', open);
+            dd.querySelector('[aria-haspopup]')?.setAttribute('aria-expanded', open);
+        }
+
+        function closeAllDropdowns() {
+            document.querySelectorAll('.dropdown.open').forEach(d => {
+                d.classList.remove('open');
+                d.querySelector('[aria-haspopup]')?.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        document.addEventListener('click', e => { if (!e.target.closest('.dropdown-menu')) closeAllDropdowns(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllDropdowns(); });
+
+        // ---------- Historique : le geste Retour d'Android ferme la couche ouverte ----------
+        // Chaque couche (vue hors Studio, classeur, modale, éditeur de deck, partie, sélection…)
+        // ajoute une entrée d'historique. Retour = fermer la couche du dessus, sans quitter l'app.
+        const navLayers = [];
+        let pendingBacks = 0;        // retours déclenchés par nous-mêmes (fermeture par un bouton)
+        const queuedPushes = [];     // entrées à ajouter une fois ces retours traités
+
+        function hasLayer(name) {
+            return navLayers.some(l => l.name === name);
+        }
+
+        function pushLayer(name, onClose) {
+            if (hasLayer(name)) return;
+            navLayers.push({ name, onClose });
+            if (pendingBacks) queuedPushes.push(name);
+            else history.pushState({ tcgbpLayer: name }, '');
+        }
+
+        // Ferme une couche ouverte : l'interface change tout de suite, l'historique suit
+        function closeLayer(name) {
+            const idx = navLayers.map(l => l.name).lastIndexOf(name);
+            if (idx === -1) return false;
+            const [layer] = navLayers.splice(idx, 1);
+            const queued = queuedPushes.indexOf(name);
+            if (queued !== -1) queuedPushes.splice(queued, 1);
+            else if (idx === navLayers.length) {
+                pendingBacks++;
+                history.back();
+            }
+            layer.onClose();
+            return true;
+        }
+
+        window.addEventListener('popstate', () => {
+            if (pendingBacks) {
+                pendingBacks--;
+            } else {
+                const layer = navLayers.pop();
+                if (layer) layer.onClose();
+            }
+            while (!pendingBacks && queuedPushes.length) history.pushState({ tcgbpLayer: queuedPushes.shift() }, '');
+        });
+
         // ---------- Application installable (PWA) ----------
         let installPromptEvent = null;
 
@@ -5241,27 +6164,30 @@
 
         function openBinder() {
             document.getElementById('binderOverlay').hidden = false;
+            pushLayer('binder', hideBinder);
             renderCollection();
             refreshNavHighlight();
-            document.getElementById('collectionSearch').focus();
         }
 
         function closeBinder() {
+            if (!closeLayer('binder')) hideBinder();
+        }
+
+        function hideBinder() {
             document.getElementById('binderOverlay').hidden = true;
             refreshNavHighlight();
         }
 
         // ---------- Mobile : barre d'onglets en bas d'écran ----------
+        // Mobile : bascule Carte / Éditer à l'intérieur du Studio
         function setMobileTab(tab) {
-            if (tab === 'collection') return setMainView('collection');
-            if (tab === 'arena') return setMainView('arena');
             document.body.dataset.mtab = tab;
-            setMainView('creator');
+            document.querySelectorAll('.studio-switch button').forEach(b => b.classList.toggle('active', b.dataset.mtab === tab));
             document.querySelector('main').scrollTop = 0;
         }
 
-        function highlightMobileTab(tab) {
-            document.querySelectorAll('#bottomTabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        function highlightMobileTab() {
+            refreshNavHighlight();
         }
 
         // Sur mobile, la carte (375px) est réduite pour tenir dans la largeur de l'écran
@@ -5286,13 +6212,13 @@
 
         // Onglets "Toutes", "Mes cartes" et un par joueur, avec compteurs
         function renderOwnerTabs() {
-            const tabs = [{ key: '', label: 'Toutes', count: collection.length }];
+            const tabs = [{ key: '', label: 'Toutes', icon: 'library', count: collection.length }];
             if (isCloudActive()) {
-                tabs.push({ key: 'mine', label: '★ Mes cartes', count: collection.filter(isOwnCard).length });
+                tabs.push({ key: 'mine', label: 'Mes cartes', icon: 'user-round', count: collection.filter(isOwnCard).length });
                 const owners = new Map();
                 collection.forEach(c => {
                     if (isOwnCard(c)) return;
-                    const o = owners.get(c.ownerId) || { label: `👤 ${c.ownerName || 'Anonyme'}`, count: 0 };
+                    const o = owners.get(c.ownerId) || { label: c.ownerName || 'Anonyme', icon: 'users', count: 0 };
                     o.count++;
                     owners.set(c.ownerId, o);
                 });
@@ -5305,7 +6231,8 @@
                 const b = document.createElement('button');
                 b.type = 'button';
                 b.className = t.key === ownerTab ? 'active' : '';
-                b.textContent = t.label;
+                b.innerHTML = icon(t.icon, 14);
+                b.appendChild(document.createTextNode(t.label));
                 const count = document.createElement('span');
                 count.className = 'tab-count';
                 count.textContent = t.count;
@@ -5347,7 +6274,8 @@
                 if (isCloudActive()) {
                     const badge = document.createElement('span');
                     badge.className = 'owner-badge ' + (mine ? 'mine' : 'friend');
-                    badge.textContent = mine ? '★ Moi' : `👤 ${card.ownerName || 'Anonyme'}`;
+                    badge.innerHTML = icon(mine ? 'user-round' : 'users', 11);
+                    badge.appendChild(document.createTextNode(mine ? 'Moi' : (card.ownerName || 'Anonyme')));
                     item.appendChild(badge);
                 }
 
@@ -5528,7 +6456,7 @@
             }
             const cards = collection.length ? collection : [readForm({ preview: true })];
             const btn = document.getElementById('ttsExportBtn');
-            const label = btn.textContent;
+            const label = btn.innerHTML;
             btn.disabled = true;
 
             try {
@@ -5538,14 +6466,14 @@
                 const canvases = [];
 
                 for (let i = 0; i < cards.length; i++) {
-                    btn.textContent = `⏳ Carte ${i + 1}/${cards.length}…`;
+                    btn.textContent = `Carte ${i + 1}/${cards.length}…`;
                     await getImageRatio(cards[i].imageSrc || DEFAULT_ART);
                     const canvas = await renderOffscreen(makeCardClone(cards[i]), SCALE);
                     canvases.push(canvas);
                     zip.file(`cartes/${String(i + 1).padStart(3, '0')}_${slugify(cards[i].name)}.png`, await canvasToBlob(canvas));
                 }
 
-                btn.textContent = '⏳ Verso et planches…';
+                btn.textContent = 'Verso et planches…';
                 const backCanvas = await renderOffscreen(makeBackClone(), SCALE);
                 zip.file('tabletop/verso.png', await canvasToBlob(backCanvas));
 
@@ -5583,7 +6511,7 @@
                     'Le dossier "cartes" contient aussi chaque carte en PNG individuel.'
                 ].join('\r\n'));
 
-                btn.textContent = '⏳ Compression…';
+                btn.textContent = 'Compression…';
                 const blob = await zip.generateAsync({ type: 'blob' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
@@ -5595,7 +6523,7 @@
             } catch (err) {
                 alert("Erreur pendant l'export Tabletop Simulator : " + err.message);
             } finally {
-                btn.textContent = label;
+                btn.innerHTML = label;
                 btn.disabled = false;
             }
         }
@@ -5634,13 +6562,13 @@
                 });
             });
 
-            document.getElementById('galleryModal').style.display = 'flex';
+            openModal('galleryModal');
         }
 
         // ---------- Planches A4 ----------
         function openPrintModal() {
             renderPrintSheets();
-            document.getElementById('printModal').style.display = 'flex';
+            openModal('printModal');
         }
 
         function renderPrintSheets() {
@@ -5679,8 +6607,14 @@
             }
         }
 
+        function openModal(id) {
+            const el = document.getElementById(id);
+            el.style.display = 'flex';
+            pushLayer(id, () => { el.style.display = 'none'; });
+        }
+
         function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
+            if (!closeLayer(id)) document.getElementById(id).style.display = 'none';
         }
     </script>
 </body>
