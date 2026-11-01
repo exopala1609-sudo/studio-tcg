@@ -100,21 +100,21 @@ function readDeckSpec() {
 }
 
 async function joinTable(resume) {
-    if (!isCloudActive()) return alert('Connectez-vous pour rejoindre une table en ligne.');
+    if (!isCloudActive()) return toast('Connectez-vous pour rejoindre une table en ligne.', { tone: 'warning' });
     if (resume) {
         game = readSavedGame();
         if (!game) return;
     } else {
         const room = document.getElementById('roomCodeInput').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
-        if (!room) return alert('Indiquez un code de salon.');
+        if (!room) return toast('Indiquez un code de salon.', { tone: 'warning' });
         const spec = readDeckSpec();
-        if (spec.mode === 'custom' && !myDecks.some(d => d.id === spec.deckId)) return alert('Choisissez ou créez un deck personnalisé.');
+        if (spec.mode === 'custom' && !myDecks.some(d => d.id === spec.deckId)) return toast('Choisissez un de vos decks, ou créez-en un dans l\'onglet Decks.', { tone: 'warning' });
         const saved = readSavedGame();
-        if (saved && saved.userId === myId() && !confirm(`Une partie est en cours dans le salon ${saved.room}. La remplacer par une nouvelle partie ?`)) return;
+        if (saved && saved.userId === myId() && !(await tcgConfirm(`Une partie est en cours dans le salon ${saved.room}. La nouvelle partie la remplacera.`, { title: 'Nouvelle partie ?', confirmLabel: 'Remplacer' }))) return;
         game = newGameState(room, spec, Date.now());
         if (!game.deck.length && !game.hand.length) {
             game = null;
-            return alert('Ce deck est vide : choisissez une autre option.');
+            return toast('Ce deck est vide : choisissez une autre option.', { tone: 'warning' });
         }
     }
     opponents = {};
@@ -171,7 +171,7 @@ function doLeaveTable() {
 }
 
 async function resetGame() {
-    if (!game || !confirm('Recommencer une nouvelle partie avec le même deck ?')) return;
+    if (!game || !(await tcgConfirm('Votre deck est remélangé ; PV, mana et terrain repartent de zéro.', { title: 'Recommencer la partie ?', confirmLabel: 'Recommencer' }))) return;
     const fresh = newGameState(game.room, game.spec, game.joinedAt);
     fresh.turn = game.turn;
     fresh.log = game.log;
@@ -306,7 +306,7 @@ function isMyTurn() {
 
 function drawCard() {
     if (!arenaRoles().amPlayer) return;
-    if (!game.deck.length) return alert('Votre pioche est vide.');
+    if (!game.deck.length) return toast('Votre pioche est vide.');
     const inst = game.deck.shift();
     game.hand.push(inst);
     lastDrawnUid = inst.uid;
@@ -337,7 +337,7 @@ function startMyTurn() {
 function endTurn() {
     if (!isMyTurn()) return;
     const next = arenaRoles().opponentId;
-    if (!next) return alert("Aucun adversaire à la table pour l'instant.");
+    if (!next) return toast("Aucun adversaire à la table pour l'instant.");
     const nextName = opponents[next]?.name || arenaPresence.find(p => p.userId === next)?.name || 'adversaire';
     game.turn = { userId: next, number: game.turn.number + 1, started: false, at: Date.now() };
     closeActionSheet();
@@ -364,7 +364,7 @@ function playFromHand(uid) {
         game.land = inst;
     } else {
         const slot = game.field.findIndex(s => !s);
-        if (slot === -1) return alert('Votre ligne de front est pleine (5 cartes) : libérez un emplacement.');
+        if (slot === -1) return toast('Votre ligne de front est pleine (5 cartes) : libérez un emplacement.', { tone: 'warning' });
         game.field[slot] = inst;
     }
     game.hand.splice(idx, 1);

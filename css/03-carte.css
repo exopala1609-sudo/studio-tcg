@@ -5,13 +5,14 @@
    Le cadre = matière selon la RARETÉ + forme/ornements selon le TYPE
    ========================================================= */
 .tcg-card {
+    --font-ui: 'Segoe UI', system-ui, -apple-system, sans-serif;
     --frame-w: 10px;
     --inner-radius: 10px;
     --co: 12px;                     /* position des ornements de coin */
     --frame-bg: linear-gradient(135deg, #3f3f46, #71717a 45%, #52525b 55%, #27272a);
     --frame-pattern: none;
     --accent: #a1a1aa;
-    --accent-glow: rgba(161, 161, 170, 0.35);
+    --accent-glow: transparent;
     --glow: 0 0 0 transparent;
     --line-1: 2px solid var(--accent);
     --line-2: 0 solid transparent;
@@ -97,18 +98,17 @@
 .tcg-card.rarity-common {
     --frame-bg: linear-gradient(135deg, #3f3f46, #71717a 45%, #52525b 55%, #27272a);
     --accent: #a1a1aa;
-    --accent-glow: rgba(161, 161, 170, 0.35);
+    --accent-glow: transparent;
 }
 .tcg-card.rarity-uncommon {
     --frame-bg: linear-gradient(135deg, #475569, #cbd5e1 35%, #f8fafc 50%, #94a3b8 65%, #334155);
     --accent: #f1f5f9;
-    --accent-glow: rgba(226, 232, 240, 0.5);
+    --accent-glow: transparent;
 }
 .tcg-card.rarity-rare {
     --frame-bg: linear-gradient(135deg, #78350f, #d97706 30%, #fde68a 50%, #d97706 70%, #78350f);
     --accent: #fde68a;
-    --accent-glow: rgba(251, 191, 36, 0.6);
-    --glow: 0 0 16px rgba(251, 191, 36, 0.35);
+    --accent-glow: transparent;
 }
 .tcg-card.rarity-epic {
     --frame-bg: linear-gradient(135deg, #3b0764, #9333ea 35%, #e9d5ff 50%, #7e22ce 65%, #3b0764);

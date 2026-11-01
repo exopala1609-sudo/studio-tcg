@@ -1,0 +1,301 @@
+/* Identité « taverne » : matières (bois, cuivre, ambre, mousse), typographie,
+   boîtes de dialogue et notifications. Chargé en dernier : prioritaire. */
+
+/* ---------- Fond et matières ---------- */
+body {
+    background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(240, 169, 58, 0.09), transparent 70%),
+        var(--grain),
+        var(--bg-dark);
+}
+
+/* Header : planche de bois sombre, liseré de cuivre */
+header.app-header {
+    background: var(--wood), linear-gradient(180deg, #2a1b11, #1c120b);
+    border-bottom: 1px solid var(--copper-dark);
+    box-shadow: 0 1px 0 rgba(240, 169, 58, 0.12), 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.editor-panel {
+    background: var(--grain), var(--bg-card);
+}
+
+.section-group {
+    background: linear-gradient(180deg, rgba(255, 236, 200, 0.03), rgba(0, 0, 0, 0.12));
+    border-color: var(--border-color);
+    border-radius: 10px;
+}
+
+.section-group h3 {
+    color: var(--amber-light);
+    letter-spacing: 0.08em;
+}
+
+/* Titres : serif de caractère, comme une enseigne */
+.view-head h2,
+.modal-toolbar h2,
+.lobby-card h2,
+.binder-title h2,
+.auth-card h2,
+.wn-slide h2,
+.tcg-dialog h2 {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+}
+
+/* ---------- Boutons ---------- */
+/* Principal : cuivre poli, texte sombre (bien lisible) */
+.btn {
+    color: #1d1009;
+    background: linear-gradient(180deg, var(--copper-light), var(--copper));
+    border: 1px solid #7a3f14;
+    box-shadow: inset 0 1px 0 rgba(255, 226, 180, 0.35), 0 1px 2px rgba(0, 0, 0, 0.45);
+    font-weight: 700;
+}
+
+.btn:hover { background: linear-gradient(180deg, #ea9858, var(--copper-light)); }
+
+.btn:disabled { filter: grayscale(0.4); }
+
+/* Secondaire : bois patiné */
+.btn.btn-secondary {
+    color: var(--text-main);
+    background: linear-gradient(180deg, #3a281b, var(--bg-raised));
+    border: 1px solid var(--wood-light);
+    box-shadow: inset 0 1px 0 rgba(255, 226, 180, 0.06);
+    font-weight: 600;
+}
+
+.btn.btn-secondary:hover { background: linear-gradient(180deg, #46311f, #36251a); }
+
+/* Action phare (nouvelle carte, débuter son tour) : ambre de bière */
+.btn.btn-new-card,
+.btn.btn-install {
+    color: #1d1009;
+    background: linear-gradient(180deg, var(--amber-light), var(--amber));
+    border: 1px solid #a8681a;
+}
+
+.btn.btn-new-card:hover,
+.btn.btn-install:hover { background: linear-gradient(180deg, #fbd78f, var(--amber-light)); }
+
+/* Succès : houblon */
+.btn.btn-success {
+    color: var(--foam);
+    background: linear-gradient(180deg, #6f9324, var(--hop));
+    border: 1px solid var(--hop-dark);
+}
+
+.btn.btn-success:hover { background: linear-gradient(180deg, #7ba52a, #678a22); }
+
+.btn.btn-ghost,
+.btn.btn-back {
+    color: var(--text-main);
+    background: transparent;
+    border: 1px solid var(--wood-light);
+    box-shadow: none;
+}
+
+.btn.btn-ghost:hover,
+.btn.btn-back:hover { background: rgba(240, 169, 58, 0.08); border-color: var(--copper-dark); }
+
+.btn.btn-danger {
+    color: #f6c8bd;
+    background: rgba(181, 67, 47, 0.18);
+    border: 1px solid rgba(181, 67, 47, 0.5);
+    box-shadow: none;
+}
+
+.btn.btn-spell { color: var(--foam); border-color: rgba(0, 0, 0, 0.4); }
+
+/* ---------- Champs de saisie ---------- */
+input[type="text"],
+input[type="number"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    background: var(--bg-deep);
+    border-color: var(--border-color);
+    color: var(--text-main);
+}
+
+input::placeholder, textarea::placeholder { color: #7d6a56; }
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--copper);
+    box-shadow: 0 0 0 2px rgba(192, 105, 42, 0.25);
+}
+
+input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color: var(--copper); }
+
+.file-upload-btn {
+    background: rgba(240, 169, 58, 0.05);
+    border-color: var(--wood-light);
+    color: var(--text-soft);
+}
+
+.file-upload-btn:hover { border-color: var(--copper); background: rgba(240, 169, 58, 0.1); }
+
+/* ---------- Onglets, menus, pastilles ---------- */
+.main-tabs { background: rgba(0, 0, 0, 0.3); border-color: var(--border-color); }
+.main-tabs button.active { background: rgba(240, 169, 58, 0.14); color: var(--amber-light); box-shadow: inset 0 0 0 1px rgba(240, 169, 58, 0.4); }
+
+.view-toggle { background: var(--bg-deep); border-color: var(--border-color); }
+.view-toggle button.active { background: linear-gradient(180deg, var(--copper-light), var(--copper)); color: #1d1009; }
+
+.dropdown-menu {
+    background: var(--grain), #22170f;
+    border-color: var(--wood-light);
+}
+
+.owner-tabs button { background: var(--bg-deep); }
+.owner-tabs button.active { background: linear-gradient(180deg, var(--copper-light), var(--copper)); border-color: #7a3f14; color: #1d1009; }
+
+.bottom-tabs { background: var(--wood), #1c120b; border-top-color: var(--copper-dark); }
+
+.collection-item, .deck-box, .deck-line, .lobby-card, .binder, .auth-card, .modal-content {
+    border-color: var(--border-color);
+}
+
+.binder, .lobby-card, .auth-card, .modal-content {
+    background: var(--grain), var(--bg-card);
+}
+
+/* Tapis de jeu : feutre vert de table de taverne, bord de bois */
+.board {
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(46, 94, 52, 0.45), transparent 72%),
+        var(--grain),
+        linear-gradient(#120c08, #19110b);
+}
+
+.player-zone { border-color: rgba(240, 169, 58, 0.1); }
+
+/* ---------- Boîtes de dialogue (remplacent alert / confirm) ---------- */
+.tcg-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(8, 5, 3, 0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: dlg-fade 0.18s ease;
+}
+
+.tcg-dialog {
+    width: min(420px, 100%);
+    border-radius: 14px;
+    border: 1px solid var(--copper-dark);
+    background: var(--wood), linear-gradient(180deg, #2b1d13, #1d130c);
+    box-shadow: inset 0 1px 0 rgba(240, 169, 58, 0.18), 0 24px 60px rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+    animation: dlg-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Bandeau de cuivre en haut, comme une plaque */
+.tcg-dialog::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, var(--copper-dark), var(--amber), var(--copper-dark));
+}
+
+.tcg-dialog-body { padding: 1.2rem 1.3rem 0.4rem; display: flex; gap: 0.9rem; }
+
+.tcg-dialog-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(240, 169, 58, 0.14);
+    color: var(--amber);
+}
+
+.tcg-dialog.danger .tcg-dialog-icon { background: rgba(181, 67, 47, 0.18); color: #ef8a73; }
+.tcg-dialog.warning .tcg-dialog-icon { background: rgba(240, 169, 58, 0.18); color: var(--amber-light); }
+
+.tcg-dialog h2 { font-size: 1.2rem; color: var(--amber-light); margin-bottom: 0.3rem; }
+.tcg-dialog p { color: var(--text-soft); line-height: 1.45; white-space: pre-line; }
+
+.tcg-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 1rem 1.3rem 1.2rem;
+    flex-wrap: wrap;
+}
+
+.btn.btn-confirm-danger {
+    color: #fde8e2;
+    background: linear-gradient(180deg, #c95a43, var(--danger));
+    border: 1px solid #7e2a1c;
+}
+
+@keyframes dlg-fade { from { opacity: 0; } }
+@keyframes dlg-pop { from { transform: translateY(8px) scale(0.97); opacity: 0; } }
+
+/* ---------- Notifications (toasts) ---------- */
+.toast-stack {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--tabbar-h, 0px) + 1rem);
+    transform: translateX(-50%);
+    z-index: 4100;
+    width: min(440px, calc(100% - 1.5rem));
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: 10px;
+    border: 1px solid var(--wood-light);
+    border-left: 4px solid var(--amber);
+    background: var(--grain), #24180f;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    animation: toast-in 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toast > svg { margin-top: 1px; color: var(--amber); }
+.toast span { flex: 1; }
+.toast-success { border-left-color: var(--hop-light); }
+.toast-success > svg { color: var(--hop-light); }
+.toast-error { border-left-color: #d9634a; }
+.toast-error > svg { color: #ef8a73; }
+.toast-warning > svg { color: var(--amber-light); }
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0 0.1rem;
+    display: inline-flex;
+}
+
+.toast.leaving { animation: toast-out 0.22s ease forwards; }
+
+@keyframes toast-in { from { transform: translateY(12px); opacity: 0; } }
+@keyframes toast-out { to { transform: translateY(8px); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+    .tcg-dialog, .tcg-dialog-overlay, .toast { animation: none; }
+}

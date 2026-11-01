@@ -142,8 +142,8 @@ function openDeckEditor(deckId) {
     renderDeckContents();
 }
 
-function closeDeckEditor() {
-    if (deckEditorState?.dirty && !confirm('Quitter sans enregistrer les modifications du deck ?')) return;
+async function closeDeckEditor() {
+    if (deckEditorState?.dirty && !(await tcgConfirm('Les modifications de ce deck ne sont pas enregistrées.', { title: "Quitter l'éditeur ?", confirmLabel: 'Quitter sans enregistrer', danger: true }))) return;
     if (!closeLayer('deckEditor')) hideDeckEditor();
 }
 
@@ -231,8 +231,8 @@ function renderDeckContents() {
 
 async function saveDeckFromEditor() {
     const name = document.getElementById('deckNameInput').value.trim();
-    if (!name) return alert('Donnez un nom à votre deck.');
-    if (!deckEditorState.cardIds.length) return alert('Ajoutez au moins une carte.');
+    if (!name) return toast('Donnez un nom à votre deck.', { tone: 'warning' });
+    if (!deckEditorState.cardIds.length) return toast('Ajoutez au moins une carte au deck.', { tone: 'warning' });
     const deck = { id: deckEditorState.id || 'deck_' + Date.now(), name, cardIds: [...deckEditorState.cardIds] };
     const idx = myDecks.findIndex(d => d.id === deck.id);
     if (idx === -1) myDecks.push(deck); else myDecks[idx] = deck;
@@ -253,7 +253,7 @@ async function duplicateDeck(id) {
 
 async function deleteDeck(id) {
     const deck = myDecks.find(d => d.id === id);
-    if (!deck || !confirm(`Supprimer le deck « ${deck.name} » ?`)) return;
+    if (!deck || !(await tcgConfirm(`Le deck « ${deck.name} » sera supprimé de tous vos appareils.`, { title: 'Supprimer le deck ?', confirmLabel: 'Supprimer', danger: true }))) return;
     myDecks = myDecks.filter(d => d.id !== id);
     renderDeckGrid();
     renderDeckSelect();

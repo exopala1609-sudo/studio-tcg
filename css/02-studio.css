@@ -18,7 +18,7 @@
     margin: auto -1.25rem 0;
     align-self: stretch;
     padding: 0.75rem 1.25rem 1rem;
-    background: linear-gradient(to top, var(--bg-dark) 75%, rgba(15, 23, 42, 0));
+    background: linear-gradient(to top, var(--bg-dark) 75%, rgba(23, 15, 10, 0));
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -134,12 +134,10 @@
     background-position: var(--gx) var(--gy);
 }
 
-.rarity-common .holo3d { --holo: 0.06; }
-.rarity-uncommon .holo3d { --holo: 0.1; }
-.rarity-rare .holo3d { --holo: 0.16; }
-.rarity-epic .holo3d { --holo: 0.26; }
+/* Irisation holographique réservée aux raretés Épique et Légendaire */
+.holo3d { --holo: 0; }
+.rarity-epic .holo3d { --holo: 0.28; }
 .rarity-legendary .holo3d { --holo: 0.45; }
-.card-back .holo3d { --holo: 0.15; }
 
 .preview-container {
     display: flex;

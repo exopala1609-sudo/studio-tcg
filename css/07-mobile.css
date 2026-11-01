@@ -76,7 +76,7 @@
     }
     .bottom-tabs button span { font-size: 0.7rem; font-weight: 600; }
     .bottom-tabs button.active { color: #fff; }
-    .bottom-tabs button.active span { color: #a5b4fc; }
+    .bottom-tabs button.active span { color: var(--amber-light); }
     .bottom-tabs button:disabled { opacity: 0.4; }
     .bottom-tabs .tab-badge {
         position: absolute;

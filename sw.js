@@ -2,7 +2,7 @@
 // on demande toujours la dernière version au réseau (donc chaque mise à jour poussée
 // sur GitHub arrive tout de suite), et on ne sert le cache qu'en secours, hors ligne.
 
-const CACHE = 'studio-tcgbp-v6';
+const CACHE = 'studio-tcgbp-v7';
 
 // Fichiers de l'app, mis en cache dès l'installation pour un premier lancement hors ligne
 const APP_FILES = [
@@ -19,6 +19,7 @@ const APP_FILES = [
     './css/07-mobile.css',
     './css/08-refonte.css',
     './css/09-impression.css',
+    './css/10-taverne.css',
     './js/01-config.js',
     './js/02-comptes.js',
     './js/03-carte.js',
@@ -28,7 +29,8 @@ const APP_FILES = [
     './js/07-arene.js',
     './js/08-nouveautes.js',
     './js/09-interface.js',
-    './js/10-exports.js'
+    './js/10-exports.js',
+    './js/11-dialogues.js'
 ];
 
 // Bibliothèques externes mises en cache pour que l'app s'ouvre même sans réseau

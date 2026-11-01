@@ -259,7 +259,7 @@ function saveCollectionToStorage() {
     try {
         localStorage.setItem('tcg_collection', JSON.stringify(collection));
     } catch (e) {
-        alert("Stockage du navigateur plein : exportez votre deck en JSON pour ne rien perdre.");
+        toast("Stockage de l'appareil plein : exportez votre collection (menu Outils) pour ne rien perdre.", { tone: 'error', duration: 9000 });
     }
 }
 

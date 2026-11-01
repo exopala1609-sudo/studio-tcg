@@ -30,7 +30,7 @@ async function withCloudStatus(label, fn) {
 
 function cloudError(message, err) {
     console.error(message, err);
-    alert(`${message} : ${err?.message || err}`);
+    toast(`${message} : ${err?.message || err}`, { tone: 'error' });
 }
 
 function isOwnCard(card) {
@@ -88,7 +88,7 @@ function handleCardChange(payload) {
         collection = collection.filter(c => c.id !== id);
         if (id === currentCardId) {
             currentCardId = null;
-            setTimeout(() => alert("La carte que vous éditiez vient d'être supprimée par son auteur. Vous pouvez l'enregistrer comme nouvelle carte."), 0);
+            setTimeout(() => tcgAlert("Son auteur vient de la supprimer. Vous pouvez l'enregistrer comme nouvelle carte avec « Ajouter à la collection ».", { title: 'Carte supprimée', tone: 'warning' }), 0);
         }
         scheduleRender();
         return;
@@ -220,10 +220,10 @@ async function deleteCard(id, event) {
     const card = collection.find(c => c.id === id);
     if (!card) return;
     if (!isOwnCard(card)) {
-        alert(`Seul(e) ${card.ownerName || "l'auteur"} peut supprimer cette carte.`);
+        toast(`Seul(e) ${card.ownerName || "l'auteur"} peut supprimer cette carte.`, { tone: 'warning' });
         return;
     }
-    if (!confirm(`Supprimer « ${card.name || 'Sans nom'} » ?`)) return;
+    if (!(await tcgConfirm(`« ${card.name || 'Sans nom'} » sera supprimée définitivement.`, { title: 'Supprimer la carte ?', confirmLabel: 'Supprimer', danger: true }))) return;
 
     if (isCloudActive()) {
         try {
@@ -243,7 +243,7 @@ async function deleteCard(id, event) {
 
 async function clearCollection() {
     if (!isCloudActive()) {
-        if (confirm("Voulez-vous vraiment vider toute la collection ?")) {
+        if (await tcgConfirm("Toutes les cartes enregistrées sur cet appareil seront supprimées.", { title: 'Vider la collection ?', confirmLabel: 'Tout supprimer', danger: true })) {
             collection = [];
             saveCollectionToStorage();
             setCurrentCard(null);
@@ -251,8 +251,8 @@ async function clearCollection() {
         return;
     }
     const mine = collection.filter(isOwnCard);
-    if (!mine.length) return alert("Vous n'avez aucune carte à supprimer.");
-    if (!confirm(`Supprimer définitivement VOS ${mine.length} cartes du cloud ?\n(Les cartes de vos amis ne sont pas touchées.)`)) return;
+    if (!mine.length) return toast("Vous n'avez aucune carte à supprimer.");
+    if (!(await tcgConfirm(`Vos ${mine.length} cartes seront supprimées du cloud. Les cartes de vos amis ne sont pas touchées.`, { title: 'Vider votre collection ?', confirmLabel: 'Supprimer mes cartes', danger: true }))) return;
     try {
         await withCloudStatus('Suppression…', async () => {
             const { error } = await sb.from('cards').delete().eq('owner_id', currentUser.id);
@@ -289,7 +289,7 @@ function updateMigrationButton() {
 
 async function migrateLocalCards() {
     const local = readLocalCollection();
-    if (!local.length || !confirm(`Envoyer vos ${local.length} carte(s) locale(s) dans le cloud ?`)) return;
+    if (!local.length || !(await tcgConfirm(`Vos ${local.length} carte(s) enregistrée(s) sur cet appareil vont rejoindre la collection partagée.`, { title: 'Envoyer dans le cloud ?', confirmLabel: 'Envoyer', tone: 'info' }))) return;
     const btn = document.getElementById('migrateBtn');
     btn.disabled = true;
     try {
@@ -297,7 +297,7 @@ async function migrateLocalCards() {
         // Copie de sécurité gardée dans le navigateur, au cas où
         localStorage.setItem('tcg_collection_backup', localStorage.getItem('tcg_collection'));
         localStorage.removeItem('tcg_collection');
-        alert(`${local.length} carte(s) envoyée(s) dans le cloud !`);
+        toast(`${local.length} carte(s) envoyée(s) dans le cloud.`, { tone: 'success' });
         await reloadCollection();
     } catch (err) {
         setCloudIdle();

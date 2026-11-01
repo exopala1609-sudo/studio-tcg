@@ -1,20 +1,42 @@
 /* Base : variables, mise en page, panneaux, formulaires */
 
 :root {
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --bg-dark: #0f172a;
-    --bg-card: #1e293b;
-    --border-color: #334155;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
+    /* Palette « taverne » : bois, cuivre, ambre de bière, mousse */
+    --bg-deep: #0e0906;        /* fond de cave */
+    --bg-dark: #170f0a;        /* bois très sombre */
+    --bg-card: #211610;        /* noyer */
+    --bg-raised: #2e1f15;      /* bois patiné : surfaces en relief */
+    --wood-light: #4a3322;
+    --border-color: #3d2a1c;
+    --copper: #c0692a;
+    --copper-dark: #94501d;
+    --copper-light: #e08b47;
+    --amber: #f0a93a;          /* bière */
+    --amber-light: #f7c873;
+    --foam: #f4e7d1;           /* mousse */
+    --text-main: #f4e7d1;
+    --text-soft: #dbc8ad;
+    --text-muted: #a8927a;
+    --hop: #5d7d1e;            /* houblon : succès */
+    --hop-dark: #4b6617;
+    --hop-light: #9bbf4a;
+    --danger: #b5432f;
+    --primary: var(--copper);
+    --primary-hover: var(--copper-dark);
+
+    --font-ui: 'Alegreya Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-display: 'Alegreya', Georgia, serif;
+
+    /* Textures (bruit SVG, très léger) : grain fin et veinage de bois horizontal */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --wood: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='160'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.09' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-ui);
 }
 
 /* L'attribut hidden doit toujours l'emporter (sinon .btn, .form-group… en display:flex le contrediraient) */
@@ -44,7 +66,7 @@ header {
 
 header h1 {
     font-size: 1.5rem;
-    background: linear-gradient(135deg, #818cf8, #c084fc);
+    background: linear-gradient(135deg, var(--amber), var(--amber));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -107,19 +129,19 @@ main {
 .editor-panel-right { border-left: 1px solid var(--border-color); }
 
 .btn.btn-new-card {
-    background: linear-gradient(135deg, #16a34a, #15803d);
+    background: linear-gradient(135deg, var(--hop), var(--hop-dark));
     font-weight: 700;
 }
 
-.btn.btn-new-card:hover { background: #15803d; }
+.btn.btn-new-card:hover { background: var(--hop-dark); }
 
 .btn.btn-binder {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    background: linear-gradient(135deg, var(--copper), var(--copper));
     font-weight: 700;
 }
 
 .section-group {
-    background: rgba(15, 23, 42, 0.4);
+    background: rgba(23, 15, 10, 0.4);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1rem;
@@ -132,7 +154,7 @@ main {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #818cf8;
+    color: var(--amber);
     margin-bottom: 0.2rem;
 }
 
@@ -161,7 +183,7 @@ label {
 
 .sub-title {
     font-size: 0.8rem;
-    color: #a5b4fc;
+    color: var(--amber-light);
     margin-top: 0.3rem;
 }
 
@@ -210,7 +232,7 @@ textarea {
 
 .file-upload-btn {
     background: var(--border-color);
-    border: 2px dashed #475569;
+    border: 2px dashed var(--wood-light);
     border-radius: 6px;
     padding: 0.75rem;
     text-align: center;
@@ -222,7 +244,7 @@ textarea {
 
 .file-upload-btn:hover {
     border-color: var(--primary);
-    background: rgba(79, 70, 229, 0.1);
+    background: rgba(192, 105, 42, 0.1);
 }
 
 input[type="file"] {

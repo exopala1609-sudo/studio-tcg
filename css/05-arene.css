@@ -24,7 +24,7 @@
 }
 
 .main-tabs button.active {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    background: linear-gradient(135deg, var(--copper), var(--copper));
     color: #fff;
 }
 
@@ -66,7 +66,7 @@ body[data-view="arena"] .arena {
 }
 
 .lobby-card h2 { text-align: center; }
-.lobby-notice { color: #fbbf24; font-size: 0.85rem; text-align: center; }
+.lobby-notice { color: var(--amber); font-size: 0.85rem; text-align: center; }
 .lobby-notice:empty { display: none; }
 
 .deck-options {
@@ -78,7 +78,7 @@ body[data-view="arena"] .arena {
     gap: 0.6rem;
 }
 
-.deck-options legend { padding: 0 0.4rem; color: #a5b4fc; font-weight: 700; font-size: 0.85rem; }
+.deck-options legend { padding: 0 0.4rem; color: var(--amber-light); font-weight: 700; font-size: 0.85rem; }
 
 .radio-row {
     display: flex;
@@ -126,7 +126,7 @@ body[data-view="arena"] .arena {
     padding: 0.6rem 0.8rem 1rem;
     background:
         radial-gradient(ellipse at 50% 50%, rgba(22, 101, 52, 0.35), transparent 70%),
-        linear-gradient(#0b1220, #0f172a);
+        linear-gradient(var(--bg-deep), var(--bg-dark));
 }
 
 .player-zone {
@@ -139,7 +139,7 @@ body[data-view="arena"] .arena {
 }
 
 .player-zone.opponent { background: rgba(127, 29, 29, 0.12); }
-.player-zone.me { background: rgba(30, 64, 175, 0.12); }
+.player-zone.me { background: rgba(192, 105, 42, 0.12); }
 
 .player-bar {
     display: flex;
@@ -266,7 +266,7 @@ body[data-view="arena"] .arena {
     bottom: -8px;
     transform: translateX(-50%);
     z-index: 3;
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(23, 15, 10, 0.95);
     border: 1px solid #f87171;
     color: #fff;
     border-radius: 999px;
@@ -329,11 +329,11 @@ body[data-view="arena"] .arena {
 
 .turn-indicator {
     font-weight: 800;
-    color: #fbbf24;
+    color: var(--amber);
     margin-right: 0.4rem;
 }
 
-.turn-indicator.mine { color: #4ade80; }
+.turn-indicator.mine { color: var(--hop-light); }
 .sidebar-toggle { display: none; }
 
 /* Ma main */
@@ -377,11 +377,11 @@ body[data-view="arena"] .arena {
 }
 
 .sidebar-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
-.arena-sidebar h4 { font-size: 0.8rem; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.05em; }
+.arena-sidebar h4 { font-size: 0.8rem; color: var(--amber-light); text-transform: uppercase; letter-spacing: 0.05em; }
 
 .presence-list { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; }
 .presence-item { display: flex; align-items: center; gap: 0.4rem; }
-.presence-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+.presence-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hop-light); }
 .presence-role { margin-left: auto; font-size: 0.7rem; color: var(--text-muted); }
 
 .game-log {
@@ -396,7 +396,7 @@ body[data-view="arena"] .arena {
 }
 
 .game-log li {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(23, 15, 10, 0.6);
     border-left: 3px solid var(--primary);
     border-radius: 4px;
     padding: 0.3rem 0.5rem;
@@ -413,7 +413,7 @@ body[data-view="arena"] .arena {
     transform: translateX(-50%);
     z-index: 30;
     width: min(640px, calc(100% - 1rem));
-    background: rgba(30, 41, 59, 0.97);
+    background: rgba(46, 31, 21, 0.97);
     border: 1px solid var(--primary);
     border-radius: 14px;
     padding: 0.75rem;
@@ -449,7 +449,7 @@ body[data-view="arena"] .arena {
 .deck-builder-head { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
 .deck-builder-head input[type="text"] { flex: 2; min-width: 180px; }
 .deck-builder-head input[type="search"] { flex: 1; min-width: 140px; }
-.deck-count { font-weight: 800; color: #a5b4fc; }
+.deck-count { font-weight: 800; color: var(--amber-light); }
 
 .deck-builder-list {
     display: grid;
@@ -470,8 +470,8 @@ body[data-view="arena"] .arena {
     cursor: pointer;
 }
 
-.deck-row.checked { border-color: #22c55e; background: rgba(22, 163, 74, 0.12); }
-.deck-row input { width: 20px; height: 20px; accent-color: #22c55e; flex-shrink: 0; }
+.deck-row.checked { border-color: var(--hop-light); background: rgba(93, 125, 30, 0.12); }
+.deck-row input { width: 20px; height: 20px; accent-color: var(--hop-light); flex-shrink: 0; }
 .deck-row-info { display: flex; flex-direction: column; min-width: 0; font-size: 0.8rem; }
 .deck-row-info strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .deck-row-info span { color: var(--text-muted); font-size: 0.72rem; }

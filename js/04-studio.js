@@ -85,13 +85,13 @@ function resetBack() {
 // Le verso est commun à tout le groupe : en mode cloud il est partagé via studio_settings
 async function setBackImage(src) {
     backImageSrc = src;
-    try { localStorage.setItem('tcg_back', src); } catch (e) { alert("Stockage plein : le verso ne sera pas mémorisé."); }
+    try { localStorage.setItem('tcg_back', src); } catch (e) { toast("Stockage plein : le verso ne sera pas mémorisé sur cet appareil.", { tone: 'warning' }); }
     applyBack();
     if (!isCloudActive()) return;
     const { error } = await sb.from('studio_settings').upsert({ key: 'back_image', value: src });
     if (error) {
         console.error('Verso :', error);
-        alert("Le verso n'a pas pu être partagé avec le groupe : " + error.message);
+        toast("Le verso n'a pas pu être partagé avec le groupe : " + error.message, { tone: 'error' });
     }
 }
 
@@ -154,7 +154,7 @@ async function uploadIfCloud(dataUrl, folder) {
         return await uploadImage(dataUrl, folder);
     } catch (err) {
         console.error('Upload :', err);
-        alert("L'envoi de l'image dans le cloud a échoué : elle est gardée dans ce navigateur.\n" + (err.message || ''));
+        toast("L'envoi de l'image a échoué : elle est gardée sur cet appareil. " + (err.message || ''), { tone: 'error' });
         return dataUrl;
     } finally {
         setCloudIdle();
@@ -348,8 +348,8 @@ function hasUnsavedChanges() {
     return stableStringify(form) !== stableStringify(normalizeCard(current));
 }
 
-function resetToNewCard() {
-    if (hasUnsavedChanges() && !confirm('Abandonner les modifications non enregistrées de la carte en cours ?')) return;
+async function resetToNewCard() {
+    if (hasUnsavedChanges() && !(await tcgConfirm('Les modifications non enregistrées de la carte en cours seront perdues.', { title: 'Commencer une nouvelle carte ?', confirmLabel: 'Abandonner et recommencer', danger: true }))) return;
     const set = (id, val) => document.getElementById(id).value = val;
     TEXT_FIELDS.forEach(id => set(id, ''));
     set('cardManaInput', 5);

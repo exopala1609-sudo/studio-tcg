@@ -24,9 +24,9 @@ function importSingleCard(event) {
     reader.onload = function(e) {
         try {
             loadCardIntoForm(JSON.parse(e.target.result), false);
-            alert("Carte importée avec succès !");
+            toast('Carte importée dans le Studio.', { tone: 'success' });
         } catch(err) {
-            alert("Erreur lors de l'importation du fichier JSON.");
+            toast("Ce fichier n'est pas une carte valide.", { tone: 'error' });
         }
     };
     reader.readAsText(file);
@@ -35,7 +35,7 @@ function importSingleCard(event) {
 
 function exportDeck() {
     if (collection.length === 0) {
-        alert("Votre collection est vide.");
+        toast('Votre collection est vide : rien à exporter.');
         return;
     }
     downloadJSON(collection, `mon_deck_tcg_${Date.now()}.json`);
@@ -50,9 +50,9 @@ function importDeck(event) {
         try {
             imported = JSON.parse(e.target.result);
         } catch(err) {
-            return alert("Erreur lors de l'importation du deck.");
+            return toast("Ce fichier n'a pas pu être lu.", { tone: 'error' });
         }
-        if (!Array.isArray(imported)) return alert("Le fichier ne contient pas un deck valide.");
+        if (!Array.isArray(imported)) return toast('Ce fichier ne contient pas un deck valide.', { tone: 'error' });
 
         if (isCloudActive()) {
             try {
@@ -68,7 +68,7 @@ function importDeck(event) {
             saveCollectionToStorage();
             renderCollection();
         }
-        alert(`${imported.length} cartes ont été ajoutées à votre collection !`);
+        toast(`${imported.length} cartes ajoutées à votre collection.`, { tone: 'success' });
     };
     reader.readAsText(file);
     event.target.value = "";
@@ -129,7 +129,7 @@ const canvasToBlob = canvas => new Promise(resolve => canvas.toBlob(resolve, 'im
 
 async function exportTabletopZip() {
     if (typeof JSZip === 'undefined') {
-        alert("La librairie ZIP n'a pas pu être chargée (connexion internet nécessaire).");
+        toast("L'export ZIP a besoin d'une connexion internet.", { tone: 'error' });
         return;
     }
     const cards = collection.length ? collection : [readForm({ preview: true })];
@@ -199,7 +199,7 @@ async function exportTabletopZip() {
         link.remove();
         setTimeout(() => URL.revokeObjectURL(link.href), 2000);
     } catch (err) {
-        alert("Erreur pendant l'export Tabletop Simulator : " + err.message);
+        toast("L'export Tabletop Simulator a échoué : " + err.message, { tone: 'error' });
     } finally {
         btn.innerHTML = label;
         btn.disabled = false;

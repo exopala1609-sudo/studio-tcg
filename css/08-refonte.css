@@ -25,8 +25,7 @@ header.app-header {
     width: 36px;
     height: 36px;
     border-radius: 9px;
-    border: 1px solid rgba(251, 191, 36, 0.7);
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.25);
+    border: 1px solid rgba(240, 169, 58, 0.7);
     flex-shrink: 0;
 }
 
@@ -36,7 +35,7 @@ header.app-header {
     letter-spacing: 0.04em;
     line-height: 1;
     padding-top: 4px;
-    background: linear-gradient(135deg, #fbbf24, #d97706);
+    background: linear-gradient(135deg, var(--amber), #d97706);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -56,11 +55,11 @@ header.app-header {
     white-space: nowrap;
 }
 
-.cloud-status .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; }
-.cloud-status.ok .status-dot { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+.cloud-status .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+.cloud-status.ok .status-dot { background: var(--hop-light); }
 .cloud-status.offline .status-dot { background: #f59e0b; }
 .cloud-status.error .status-dot { background: #ef4444; }
-.cloud-status.busy .status-dot { background: #fbbf24; animation: status-pulse 1s ease-in-out infinite; }
+.cloud-status.busy .status-dot { background: var(--amber); animation: status-pulse 1s ease-in-out infinite; }
 .cloud-status.ok, .cloud-status.offline, .cloud-status.error { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
 
 @keyframes status-pulse { 50% { opacity: 0.3; } }
@@ -68,7 +67,7 @@ header.app-header {
 /* Onglets principaux (centre) */
 .main-tabs {
     justify-self: center;
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(23, 15, 10, 0.7);
     border: 1px solid var(--border-color);
     padding: 3px;
 }
@@ -84,9 +83,9 @@ header.app-header {
 .main-tabs button:hover { color: var(--text-main); }
 
 .main-tabs button.active {
-    background: rgba(251, 191, 36, 0.14);
-    color: #fcd34d;
-    box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.4);
+    background: rgba(240, 169, 58, 0.14);
+    color: var(--amber-light);
+    box-shadow: inset 0 0 0 1px rgba(240, 169, 58, 0.4);
 }
 
 .tab-count {
@@ -168,7 +167,7 @@ header.app-header {
     display: none;
     flex-direction: column;
     padding: 0.35rem;
-    background: #172033;
+    background: var(--bg-raised);
     border: 1px solid var(--border-color);
     border-radius: 10px;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
@@ -193,7 +192,7 @@ header.app-header {
 }
 
 .dropdown-menu button:hover { background: rgba(255, 255, 255, 0.07); }
-.dropdown-menu button svg { color: #fbbf24; }
+.dropdown-menu button svg { color: var(--amber); }
 .dropdown-menu hr { border: none; border-top: 1px solid var(--border-color); margin: 0.3rem 0; }
 .dropdown-menu .menu-logout svg { color: #f87171; }
 
@@ -209,7 +208,7 @@ header.app-header {
     align-items: center;
     gap: 0.4rem;
     font-size: 0.8rem;
-    color: #fbbf24;
+    color: var(--amber);
 }
 
 /* Aide au survol (ou au toucher) à la place des paragraphes d'astuces */
@@ -242,9 +241,9 @@ header.app-header {
     max-width: 260px;
     padding: 0.55rem 0.7rem;
     border-radius: 8px;
-    background: #0b1220;
+    background: var(--bg-deep);
     border: 1px solid var(--border-color);
-    color: #cbd5e1;
+    color: var(--text-soft);
     font-size: 0.78rem;
     font-weight: 400;
     line-height: 1.4;
@@ -260,7 +259,7 @@ header.app-header {
 .view-toggle button { display: inline-flex; align-items: center; gap: 0.4rem; }
 
 .editing-badge { display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
-.editing-badge.locked { color: #fcd34d; }
+.editing-badge.locked { color: var(--amber-light); }
 .editing-badge.locked::before {
     content: '';
     width: 14px;
@@ -314,13 +313,13 @@ body[data-view="decks"] .decks-view {
     padding: 0.9rem;
     border-radius: 12px;
     background:
-        linear-gradient(160deg, rgba(251, 191, 36, 0.08), transparent 40%),
+        linear-gradient(160deg, rgba(240, 169, 58, 0.08), transparent 40%),
         var(--bg-card);
     border: 1px solid var(--border-color);
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.deck-box:hover { border-color: rgba(251, 191, 36, 0.5); transform: translateY(-2px); }
+.deck-box:hover { border-color: rgba(240, 169, 58, 0.5); transform: translateY(-2px); }
 
 /* Boîte de deck : la 1re carte posée sur deux cartes de dos */
 .deck-cover { position: relative; flex-shrink: 0; padding: 0 8px 8px 0; }
@@ -330,7 +329,7 @@ body[data-view="decks"] .decks-view {
     inset: 8px 0 0 8px;
     border-radius: 8px;
     background: linear-gradient(135deg, #3b2410, #b45309);
-    border: 1px solid rgba(251, 191, 36, 0.4);
+    border: 1px solid rgba(240, 169, 58, 0.4);
 }
 .deck-cover::before { inset: 4px 4px 4px 4px; }
 .deck-cover .mini-card { position: relative; z-index: 1; }
@@ -400,7 +399,7 @@ body[data-view="decks"] .decks-view {
 
 .pool-tile:hover { transform: translateY(-3px); }
 .pool-tile:active { transform: scale(0.96); }
-.pool-tile.in-deck { outline: 2px solid #22c55e; outline-offset: 2px; }
+.pool-tile.in-deck { outline: 2px solid var(--hop-light); outline-offset: 2px; }
 
 .pool-count {
     position: absolute;
@@ -410,7 +409,7 @@ body[data-view="decks"] .decks-view {
     min-width: 24px;
     padding: 0.1rem 0.35rem;
     border-radius: 999px;
-    background: #16a34a;
+    background: var(--hop);
     color: #fff;
     font-size: 0.75rem;
     font-weight: 800;
@@ -439,7 +438,7 @@ body[data-view="decks"] .decks-view {
 
 /* ---------- Arène ---------- */
 .lobby-card h2 { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-.lobby-card h2 svg { width: 24px; height: 24px; color: #fbbf24; }
+.lobby-card h2 svg { width: 24px; height: 24px; color: var(--amber); }
 
 .arena-topbar {
     display: flex;
@@ -470,8 +469,8 @@ body[data-view="decks"] .decks-view {
     width: auto;
     z-index: auto;
     box-shadow: none;
-    border-color: rgba(251, 191, 36, 0.5);
-    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(240, 169, 58, 0.5);
+    background: rgba(46, 31, 21, 0.9);
     padding: 0.55rem 0.7rem;
 }
 
@@ -489,7 +488,7 @@ body[data-view="decks"] .decks-view {
 }
 
 .hand-card { position: relative; scroll-snap-align: center; }
-.hand-card.selected { transform: translateY(-14px); outline: 3px solid #fbbf24; }
+.hand-card.selected { transform: translateY(-14px); outline: 3px solid var(--amber); }
 .hand-card:hover:not(.selected) { transform: translateY(-6px); }
 
 /* Boutons rapides de la carte de main sélectionnée */
@@ -503,7 +502,7 @@ body[data-view="decks"] .decks-view {
     gap: 0.3rem;
     padding: 0.25rem;
     border-radius: 10px;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(23, 15, 10, 0.9);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
 }
 
@@ -511,7 +510,7 @@ body[data-view="decks"] .decks-view {
 .hand-empty { display: inline-flex; align-items: center; gap: 0.4rem; }
 
 .game-log li { display: flex; align-items: flex-start; gap: 0.35rem; flex-wrap: wrap; }
-.game-log li svg { color: #fbbf24; margin-top: 2px; }
+.game-log li svg { color: var(--amber); margin-top: 2px; }
 
 /* Modales : bouton Retour en haut à gauche */
 .modal-toolbar { justify-content: flex-start; }
@@ -533,7 +532,7 @@ body[data-view="decks"] .decks-view {
 .auth-brand .brand-name { font-size: 2rem; }
 
 /* Quoi de neuf : icônes à la place des emojis */
-.wn-icons span { display: inline-flex; color: #fcd34d; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5)); }
+.wn-icons span { display: inline-flex; color: var(--amber-light); filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5)); }
 .wn-icons svg { width: 76px; height: 76px; stroke-width: 1.6; }
 .wn-skip { display: inline-flex; align-items: center; gap: 0.35rem; }
 .btn.wn-next { gap: 0.4rem; }
@@ -560,3 +559,47 @@ body[data-view="decks"] .decks-view {
     .user-chip { display: none; }   /* Déconnexion : dans le menu Outils */
     .hide-sm { display: none; }
     .header-right .btn-ghost { padding: 0.45rem 0.6rem; }
+
+    /* Bascule Carte / Éditer collée en haut du Studio */
+    .studio-switch {
+        display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        gap: 0.3rem;
+        padding: 0.45rem 0.75rem;
+        background: rgba(23, 15, 10, 0.95);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .studio-switch button {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: transparent;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+    .studio-switch button.active { background: rgba(240, 169, 58, 0.14); color: var(--amber-light); border-color: rgba(240, 169, 58, 0.4); }
+
+    .bottom-tabs button svg { width: 21px; height: 21px; }
+    .bottom-tabs button.active { color: var(--amber-light); }
+    .bottom-tabs button.active span { color: var(--amber-light); }
+
+    body[data-view="decks"] .decks-view { margin-bottom: var(--tabbar-h); }
+    .decks-list-view, .deck-editor { padding: 0.8rem; }
+    .deck-grid { grid-template-columns: 1fr; }
+    .deck-editor-head .btn-back { order: -1; }
+    .deck-editor-head input[type="text"] { flex-basis: 100%; order: 1; }
+    .deck-editor-head .deck-count { order: 2; }
+    .deck-editor-head .btn-success { order: 3; margin-left: auto; }
+    .pool-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); }
+
+    .action-sheet { position: static; bottom: auto; width: auto; }
+    .board { padding-bottom: 1rem; }
+    .hand { padding: 1.2rem 0.6rem 0.6rem; }
+}
