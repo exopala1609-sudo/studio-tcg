@@ -1,0 +1,58 @@
+/* Impression des planches A4 */
+
+    /* Bascule Carte / Éditer collée en haut du Studio */
+    .studio-switch {
+        display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        gap: 0.3rem;
+        padding: 0.45rem 0.75rem;
+        background: rgba(15, 23, 42, 0.95);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .studio-switch button {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: transparent;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+    .studio-switch button.active { background: rgba(251, 191, 36, 0.14); color: #fcd34d; border-color: rgba(251, 191, 36, 0.4); }
+
+    .bottom-tabs button svg { width: 21px; height: 21px; }
+    .bottom-tabs button.active { color: #fcd34d; }
+    .bottom-tabs button.active span { color: #fcd34d; }
+
+    body[data-view="decks"] .decks-view { margin-bottom: var(--tabbar-h); }
+    .decks-list-view, .deck-editor { padding: 0.8rem; }
+    .deck-grid { grid-template-columns: 1fr; }
+    .deck-editor-head .btn-back { order: -1; }
+    .deck-editor-head input[type="text"] { flex-basis: 100%; order: 1; }
+    .deck-editor-head .deck-count { order: 2; }
+    .deck-editor-head .btn-success { order: 3; margin-left: auto; }
+    .pool-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); }
+
+    .action-sheet { position: static; bottom: auto; width: auto; }
+    .board { padding-bottom: 1rem; }
+    .hand { padding: 1.2rem 0.6rem 0.6rem; }
+}
+
+@media print {
+    @page { size: A4; margin: 0; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body > *:not(#printModal) { display: none !important; }
+    body { background: white; }
+    #printModal { position: static; display: block !important; background: none; padding: 0; }
+    #printModal .modal-content { display: block; padding: 0; border: none; max-height: none; overflow: visible; background: none; max-width: none; }
+    #printModal .no-print { display: none !important; }
+    .print-preview-wrap { background: none; padding: 0; gap: 0; display: block; overflow: visible; }
+    .print-sheet { box-shadow: none; margin: 0; page-break-after: always; break-after: page; }
+    .print-card-slot { border-color: #e2e8f0; }
+}

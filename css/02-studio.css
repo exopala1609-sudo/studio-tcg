@@ -1,0 +1,149 @@
+/* Studio : aperçu, barre d'actions, vue 3D */
+
+/* Panneau de prévisualisation & Collection */
+.preview-panel {
+    padding: 1.25rem 1.25rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    gap: 1rem;
+}
+
+/* Barre d'actions collée en bas de la zone centrale */
+.center-actions {
+    position: sticky;
+    bottom: 0;
+    margin: auto -1.25rem 0;
+    align-self: stretch;
+    padding: 0.75rem 1.25rem 1rem;
+    background: linear-gradient(to top, var(--bg-dark) 75%, rgba(15, 23, 42, 0));
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 5;
+}
+
+/* Sélecteur de vue */
+.view-toggle {
+    display: inline-flex;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.view-toggle button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.view-toggle button.active { background: var(--primary); color: #fff; }
+
+/* Vue 3D interactive (clones d'affichage uniquement) */
+.preview-3d {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0 1rem;
+}
+
+.preview-3d[hidden], .preview-cards[hidden] { display: none; }
+
+.scene3d {
+    --rx: 0deg;
+    --ry: 0deg;
+    --gx: 50%;
+    --gy: 50%;
+    --glare: 0;
+    width: 375px;
+    height: 523px;
+    perspective: 1100px;
+    cursor: pointer;
+    touch-action: pan-y;
+}
+
+.tilt3d {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transition: transform 0.12s ease-out;
+}
+
+.scene3d.resting .tilt3d { transition: transform 0.5s ease; }
+
+.flipper3d {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.flipper3d.flipped { transform: rotateY(180deg); }
+
+.face3d {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.face3d-back { transform: rotateY(180deg); }
+
+.face3d .tcg-card { position: absolute; top: 0; left: 0; }
+
+/* Reflet qui suit le curseur + irisation holographique (plus forte selon la rareté) */
+.glare3d {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 10;
+    opacity: var(--glare);
+    transition: opacity 0.3s ease;
+    mix-blend-mode: overlay;
+    background:
+        radial-gradient(circle at var(--gx) var(--gy), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 45%);
+}
+
+.holo3d {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 9;
+    opacity: calc(var(--glare) * var(--holo, 0.25));
+    transition: opacity 0.3s ease;
+    mix-blend-mode: color-dodge;
+    background: linear-gradient(115deg,
+        transparent 20%, #ff0080 32%, #ffd700 42%, #00ffc8 52%, #0080ff 62%, #c800ff 72%, transparent 84%);
+    background-size: 250% 250%;
+    background-position: var(--gx) var(--gy);
+}
+
+.rarity-common .holo3d { --holo: 0.06; }
+.rarity-uncommon .holo3d { --holo: 0.1; }
+.rarity-rare .holo3d { --holo: 0.16; }
+.rarity-epic .holo3d { --holo: 0.26; }
+.rarity-legendary .holo3d { --holo: 0.45; }
+.card-back .holo3d { --holo: 0.15; }
+
+.preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}

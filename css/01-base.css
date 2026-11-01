@@ -1,0 +1,239 @@
+/* Base : variables, mise en page, panneaux, formulaires */
+
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --bg-dark: #0f172a;
+    --bg-card: #1e293b;
+    --border-color: #334155;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* L'attribut hidden doit toujours l'emporter (sinon .btn, .form-group… en display:flex le contrediraient) */
+[hidden] { display: none !important; }
+
+/* Dans la Table de Jeu, les outils du Créateur quittent le header pour laisser la place au tapis */
+body[data-view="arena"] .creator-only { display: none; }
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* PC (> 1200px) : cockpit 3 colonnes, éditeur gauche | carte | éditeur droit */
+main {
+    display: grid;
+    grid-template-columns: 360px 1fr 360px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Tablette (768-1200px) : les deux éditeurs empilés à gauche, la carte à droite */
+@media (min-width: 768px) and (max-width: 1200px) {
+    main {
+        grid-template-columns: 340px 1fr;
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas: "left center" "right center";
+    }
+    .editor-panel-left { grid-area: left; }
+    .preview-panel { grid-area: center; }
+    .editor-panel-right {
+        grid-area: right;
+        border-left: none;
+        border-right: 1px solid var(--border-color);
+        border-top: 1px solid var(--border-color);
+    }
+}
+
+/* Panneaux de configuration */
+.editor-panel {
+    background: var(--bg-card);
+    padding: 1.25rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Colonnes étroites : les champs rétrécissent au lieu de déborder */
+.editor-panel .form-row > *,
+.editor-panel .form-group > input,
+.editor-panel .form-group > select,
+.editor-panel .form-group > textarea,
+.editor-panel .spell-editor > textarea {
+    min-width: 0;
+    width: 100%;
+}
+
+.editor-panel .form-group > .btn { white-space: normal; }
+
+.editor-panel-left { border-right: 1px solid var(--border-color); }
+.editor-panel-right { border-left: 1px solid var(--border-color); }
+
+.btn.btn-new-card {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    font-weight: 700;
+}
+
+.btn.btn-new-card:hover { background: #15803d; }
+
+.btn.btn-binder {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    font-weight: 700;
+}
+
+.section-group {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.section-group h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #818cf8;
+    margin-bottom: 0.2rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.sub-title {
+    font-size: 0.8rem;
+    color: #a5b4fc;
+    margin-top: 0.3rem;
+}
+
+.spell-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.6rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 6px;
+}
+
+.spell-editor textarea { min-height: 40px; }
+
+.form-row.spell-row { grid-template-columns: 2fr 1fr; }
+
+input[type="text"],
+input[type="number"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.6rem;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+}
+
+input[type="range"] {
+    accent-color: var(--primary);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+.file-upload-btn {
+    background: var(--border-color);
+    border: 2px dashed #475569;
+    border-radius: 6px;
+    padding: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    transition: all 0.2s;
+}
+
+.file-upload-btn:hover {
+    border-color: var(--primary);
+    background: rgba(79, 70, 229, 0.1);
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    user-select: none;
+}

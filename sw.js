@@ -2,7 +2,34 @@
 // on demande toujours la dernière version au réseau (donc chaque mise à jour poussée
 // sur GitHub arrive tout de suite), et on ne sert le cache qu'en secours, hors ligne.
 
-const CACHE = 'studio-tcgbp-v5';
+const CACHE = 'studio-tcgbp-v6';
+
+// Fichiers de l'app, mis en cache dès l'installation pour un premier lancement hors ligne
+const APP_FILES = [
+    './',
+    './manifest.json',
+    './assets/verso-tcgbp.webp',
+    './icons/icon-192.png',
+    './css/01-base.css',
+    './css/02-studio.css',
+    './css/03-carte.css',
+    './css/04-interface.css',
+    './css/05-arene.css',
+    './css/06-nouveautes.css',
+    './css/07-mobile.css',
+    './css/08-refonte.css',
+    './css/09-impression.css',
+    './js/01-config.js',
+    './js/02-comptes.js',
+    './js/03-carte.js',
+    './js/04-studio.js',
+    './js/05-collection.js',
+    './js/06-navigation-decks.js',
+    './js/07-arene.js',
+    './js/08-nouveautes.js',
+    './js/09-interface.js',
+    './js/10-exports.js'
+];
 
 // Bibliothèques externes mises en cache pour que l'app s'ouvre même sans réseau
 const CACHEABLE_HOSTS = [
@@ -16,7 +43,7 @@ const CACHEABLE_HOSTS = [
 self.addEventListener('install', event => {
     // La nouvelle version prend la main sans attendre la fermeture des onglets
     self.skipWaiting();
-    event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['./', './manifest.json'])));
+    event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_FILES)));
 });
 
 self.addEventListener('activate', event => {

@@ -1,0 +1,112 @@
+/* PWA et affichage mobile (< 768 px) */
+
+/* Bouton d'installation de l'app (visible seulement quand le navigateur la propose) */
+.btn.btn-install { background: linear-gradient(135deg, #0ea5e9, #2563eb); font-weight: 700; }
+.btn-install[hidden] { display: none; }
+
+/* Barre d'onglets mobile (cachée sur PC et tablette) */
+.bottom-tabs { display: none; }
+
+/* =================== MOBILE (< 768px) =================== */
+@media (max-width: 767px) {
+    :root { --tabbar-h: 62px; }
+
+    header { padding: 0.6rem 0.75rem; gap: 0.5rem; }
+    header h1 { font-size: 1.1rem; }
+    .header-actions {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 0.5rem;
+        padding-bottom: 2px;
+    }
+    .header-actions .btn { white-space: nowrap; padding: 0.45rem 0.8rem; font-size: 0.8rem; }
+
+    /* Une seule vue à la fois, la page défile dans <main> */
+    main {
+        display: block;
+        overflow-y: auto;
+        margin-bottom: var(--tabbar-h);
+    }
+    .editor-panel, .preview-panel { overflow: visible; }
+    .editor-panel-left, .editor-panel-right { border: none; }
+    .editor-panel-right { padding-top: 0; }
+    body[data-mtab="card"] .editor-panel { display: none; }
+    body[data-mtab="edit"] .preview-panel { display: none; }
+    .preview-panel { padding: 0.75rem 0.75rem 0; min-height: 100%; }
+    .center-actions { margin: auto -0.75rem 0; padding: 0.6rem 0.75rem 0.75rem; }
+    /* Une seule rangée de boutons qui défile, pour ne pas masquer la carte */
+    .action-bar {
+        gap: 0.4rem;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 2px;
+    }
+    .action-bar .btn { padding: 0.5rem 0.7rem; font-size: 0.8rem; white-space: nowrap; flex-shrink: 0; }
+    .editing-badge { font-size: 0.75rem; }
+
+    /* La carte tient dans la largeur de l'écran (--card-zoom calculé en JS) */
+    #previewEdit .tcg-card, .scene3d { zoom: var(--card-zoom, 1); }
+
+    .bottom-tabs {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: var(--tabbar-h);
+        z-index: 950;
+        background: var(--bg-card);
+        border-top: 1px solid var(--border-color);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .bottom-tabs button {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        font-size: 1.25rem;
+        position: relative;
+    }
+    .bottom-tabs button span { font-size: 0.7rem; font-weight: 600; }
+    .bottom-tabs button.active { color: #fff; }
+    .bottom-tabs button.active span { color: #a5b4fc; }
+    .bottom-tabs button:disabled { opacity: 0.4; }
+    .bottom-tabs .tab-badge {
+        position: absolute;
+        top: 6px;
+        right: calc(50% - 24px);
+        background: var(--primary);
+        color: #fff;
+        font-size: 0.6rem;
+        border-radius: 999px;
+        padding: 0 5px;
+    }
+
+    /* Classeur : sous la barre d'onglets pour pouvoir en sortir */
+    .binder-overlay { padding: 0.5rem; }
+    .binder { padding: 0.9rem; }
+    .collection-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+    .collection-item:hover { transform: none; box-shadow: none; }
+
+    /* Navigation : la barre d'onglets du bas remplace les onglets du header */
+    .main-tabs { display: none; }
+    body[data-view="arena"] .arena { margin-bottom: var(--tabbar-h); }
+    .arena-lobby { padding: 1rem 0.6rem; }
+    .board { padding: 0.4rem 0.4rem 7rem; }
+    .player-bar { gap: 0.4rem; font-size: 0.8rem; }
+    .stat-chip button { min-width: 34px; min-height: 32px; }
+    .center-bar .btn { padding: 0.45rem 0.6rem; font-size: 0.78rem; }
+    .action-sheet {
+        position: fixed;
+        bottom: calc(var(--tabbar-h) + 0.4rem);
+        width: calc(100% - 0.8rem);
+    }
+    .hand-card:hover { transform: none; }
+}

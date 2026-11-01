@@ -1,0 +1,533 @@
+/* Design de la carte : cadres (type × rareté), illustration, textes, mana */
+
+/* =========================================================
+   DESIGN DE LA CARTE TCG (Ratio 63x88mm -> 375 x 523 px)
+   Le cadre = matière selon la RARETÉ + forme/ornements selon le TYPE
+   ========================================================= */
+.tcg-card {
+    --frame-w: 10px;
+    --inner-radius: 10px;
+    --co: 12px;                     /* position des ornements de coin */
+    --frame-bg: linear-gradient(135deg, #3f3f46, #71717a 45%, #52525b 55%, #27272a);
+    --frame-pattern: none;
+    --accent: #a1a1aa;
+    --accent-glow: rgba(161, 161, 170, 0.35);
+    --glow: 0 0 0 transparent;
+    --line-1: 2px solid var(--accent);
+    --line-2: 0 solid transparent;
+    --line2-inset: 0px;
+    --inner-vignette: none;
+    --elem-bg: linear-gradient(135deg, #1e293b, #0f172a);
+
+    width: 375px;
+    height: 523px;
+    flex-shrink: 0;
+    border-radius: 18px;
+    position: relative;
+    background: var(--frame-bg);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1), var(--glow);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+    transition: box-shadow 0.3s ease;
+}
+
+#renderCard { cursor: grab; touch-action: pan-y pinch-zoom; }
+#renderCard.drag-armed { outline: 3px solid #fbbf24; outline-offset: 4px; }
+#renderCard.dragging { cursor: grabbing; }
+
+/* Texture du cadre (selon le type) */
+.tcg-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--frame-pattern);
+    pointer-events: none;
+}
+
+.card-inner {
+    position: absolute;
+    top: var(--frame-w);
+    left: var(--frame-w);
+    right: var(--frame-w);
+    bottom: var(--frame-w);
+    border-radius: var(--inner-radius);
+    overflow: hidden;
+    background: var(--elem-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Filets intérieurs du cadre (selon le type).
+   Bordures/dégradés plutôt que box-shadow inset, mal rendu par html2canvas. */
+.card-inner::after, .card-inner::before {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    z-index: 4;
+    box-sizing: border-box;
+}
+
+.card-inner::after {
+    inset: 0;
+    border-radius: inherit;
+    border: var(--line-1);
+    background: var(--inner-vignette);
+}
+
+.card-inner::before {
+    inset: var(--line2-inset);
+    border-radius: max(0px, calc(var(--inner-radius) - var(--line2-inset)));
+    border: var(--line-2);
+}
+
+/* --- Ambiance de fond (élément) --- */
+.tcg-card.elem-fire { --elem-bg: linear-gradient(135deg, #7f1d1d, #1e1b4b); }
+.tcg-card.elem-water { --elem-bg: linear-gradient(135deg, #1e3a8a, #0f172a); }
+.tcg-card.elem-nature { --elem-bg: linear-gradient(135deg, #14532d, #0f172a); }
+.tcg-card.elem-light { --elem-bg: linear-gradient(135deg, #713f12, #1e1b4b); }
+.tcg-card.elem-dark { --elem-bg: linear-gradient(135deg, #1f2937, #020617); }
+.tcg-card.elem-metal { --elem-bg: linear-gradient(135deg, #334155, #0f172a); }
+.tcg-card.elem-neutral { --elem-bg: linear-gradient(135deg, #1e293b, #0f172a); }
+
+/* --- RARETÉ : matière du cadre --- */
+.tcg-card.rarity-common {
+    --frame-bg: linear-gradient(135deg, #3f3f46, #71717a 45%, #52525b 55%, #27272a);
+    --accent: #a1a1aa;
+    --accent-glow: rgba(161, 161, 170, 0.35);
+}
+.tcg-card.rarity-uncommon {
+    --frame-bg: linear-gradient(135deg, #475569, #cbd5e1 35%, #f8fafc 50%, #94a3b8 65%, #334155);
+    --accent: #f1f5f9;
+    --accent-glow: rgba(226, 232, 240, 0.5);
+}
+.tcg-card.rarity-rare {
+    --frame-bg: linear-gradient(135deg, #78350f, #d97706 30%, #fde68a 50%, #d97706 70%, #78350f);
+    --accent: #fde68a;
+    --accent-glow: rgba(251, 191, 36, 0.6);
+    --glow: 0 0 16px rgba(251, 191, 36, 0.35);
+}
+.tcg-card.rarity-epic {
+    --frame-bg: linear-gradient(135deg, #3b0764, #9333ea 35%, #e9d5ff 50%, #7e22ce 65%, #3b0764);
+    --accent: #e9d5ff;
+    --accent-glow: rgba(192, 132, 252, 0.75);
+    --glow: 0 0 24px rgba(168, 85, 247, 0.55);
+}
+.tcg-card.rarity-legendary {
+    --frame-bg: linear-gradient(120deg, #f43f5e, #f59e0b, #fde047, #22c55e, #06b6d4, #6366f1, #d946ef, #f43f5e);
+    --accent: #fff7d6;
+    --accent-glow: rgba(255, 255, 255, 0.75);
+    --glow: 0 0 28px rgba(250, 204, 21, 0.5), 0 0 50px rgba(217, 70, 239, 0.35);
+}
+
+/* --- TYPE : forme du cadre & ornements --- */
+/* Héros : cadre royal, double filet, gemmes aux coins */
+.tcg-card.type-hero {
+    --frame-w: 10px;
+    --inner-radius: 10px;
+    --co: 12px;
+    border-radius: 18px;
+    --line-1: 2px solid var(--accent);
+    --line-2: 1px solid var(--accent);
+    --line2-inset: 5px;
+}
+/* Sort : cadre arrondi, halo arcanique intérieur, orbes latérales */
+.tcg-card.type-spell {
+    --frame-w: 9px;
+    --inner-radius: 18px;
+    border-radius: 26px;
+    --line-1: 1px solid var(--accent);
+    --inner-vignette:
+        linear-gradient(to right, var(--accent-glow), rgba(0,0,0,0) 16px),
+        linear-gradient(to left, var(--accent-glow), rgba(0,0,0,0) 16px),
+        linear-gradient(to bottom, var(--accent-glow), rgba(0,0,0,0) 16px),
+        linear-gradient(to top, var(--accent-glow), rgba(0,0,0,0) 16px);
+}
+/* Artefact : cadre forgé anguleux, métal brossé, rivets */
+.tcg-card.type-artifact {
+    --frame-w: 11px;
+    --inner-radius: 2px;
+    --co: 11px;
+    border-radius: 8px;
+    --frame-pattern: repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 1px, transparent 1px 4px);
+    --line-1: 2px solid rgba(0,0,0,0.75);
+    --line-2: 1px solid var(--accent);
+    --line2-inset: 2px;
+}
+/* Terrain : cadre épais en pierre striée, pics haut/bas */
+.tcg-card.type-land {
+    --frame-w: 13px;
+    --inner-radius: 12px;
+    border-radius: 16px;
+    --frame-pattern: repeating-linear-gradient(135deg, rgba(0,0,0,0.20) 0 3px, transparent 3px 9px), repeating-linear-gradient(45deg, rgba(255,255,255,0.07) 0 2px, transparent 2px 11px);
+    --line-1: 2px solid var(--accent);
+    --inner-vignette: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0) 28px);
+}
+
+.tcg-card.full-art {
+    --frame-w: 5px;
+    --co: 7px;
+}
+
+/* Ornements */
+.frame-orn {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.orn {
+    --s: 14px;
+    position: absolute;
+    width: var(--s);
+    height: var(--s);
+    display: none;
+}
+
+.orn.tl { top: calc(var(--co) - var(--s) / 2); left: calc(var(--co) - var(--s) / 2); }
+.orn.tr { top: calc(var(--co) - var(--s) / 2); right: calc(var(--co) - var(--s) / 2); }
+.orn.bl { bottom: calc(var(--co) - var(--s) / 2); left: calc(var(--co) - var(--s) / 2); }
+.orn.br { bottom: calc(var(--co) - var(--s) / 2); right: calc(var(--co) - var(--s) / 2); }
+.orn.t { top: calc(var(--frame-w) / 2 - var(--s) / 2); left: calc(50% - var(--s) / 2); }
+.orn.b { bottom: calc(var(--frame-w) / 2 - var(--s) / 2); left: calc(50% - var(--s) / 2); }
+.orn.l { left: calc(var(--frame-w) / 2 - var(--s) / 2); top: calc(50% - var(--s) / 2); }
+.orn.r { right: calc(var(--frame-w) / 2 - var(--s) / 2); top: calc(50% - var(--s) / 2); }
+
+/* Héros : gemmes losanges */
+.type-hero .orn.tl, .type-hero .orn.tr, .type-hero .orn.bl, .type-hero .orn.br {
+    display: block;
+    transform: rotate(45deg);
+    background: linear-gradient(135deg, #fff, var(--accent) 45%, rgba(0,0,0,0.6));
+    border: 1px solid rgba(0,0,0,0.7);
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+/* Sort : orbes */
+.type-spell .orn.l, .type-spell .orn.r {
+    --s: 16px;
+    display: block;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff, var(--accent) 40%, rgba(0,0,0,0.75));
+    border: 1px solid rgba(0,0,0,0.6);
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+/* Artefact : rivets */
+.type-artifact .orn {
+    --s: 8px;
+    display: block;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff, var(--accent) 35%, #111 90%);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.7);
+}
+/* Terrain : pics */
+.type-land .orn.t, .type-land .orn.b {
+    --s: 18px;
+    display: block;
+    transform: rotate(45deg);
+    background: linear-gradient(135deg, var(--accent), rgba(0,0,0,0.55));
+    border: 2px solid rgba(0,0,0,0.6);
+}
+
+/* Image d'arrière-plan de la carte */
+.card-art-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+    container-type: size;           /* permet de dimensionner l'image en cqw/cqh */
+}
+
+/* L'image garde ses proportions naturelles (--img-ratio = largeur/hauteur) et,
+   à zoom 100 %, couvre juste la fenêtre : le déplacement révèle les parties
+   hors cadre au lieu d'une bande vide. Centrée via le translate(-50%, -50%) du JS.
+   Fond plutôt qu'<img> + object-fit, non géré par html2canvas (exports). */
+.card-art-img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100cqw, calc(100cqh * var(--img-ratio, 1)));
+    height: max(100cqh, calc(100cqw / var(--img-ratio, 1)));
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    transform-origin: center;
+    pointer-events: none;
+}
+
+/* Fenêtre d'illustration : rectangle entre le nom et le bandeau type/PV.
+   En Full Art elle devient "static" : l'image se cale alors sur toute la carte. */
+.card-art-window {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    margin: 0 10px;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--elem-bg);
+    z-index: 1;
+}
+
+.full-art .card-art-window {
+    position: static;
+    border-color: transparent;
+    background: none;
+}
+
+/* Hauteur de zone d'image choisie : le cadre de texte prend la place restante */
+.art-fixed:not(.full-art) .card-art-window {
+    flex: none;
+    height: var(--art-h);
+}
+
+.art-fixed:not(.full-art) .card-footer-overlay {
+    flex: 1;
+    min-height: 0;
+}
+
+.art-fixed:not(.full-art) .card-textbox {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Éléments internes de la carte */
+.card-header-overlay, .card-footer-overlay {
+    position: relative;
+    z-index: 2;
+}
+
+.card-header-overlay {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px 6px 16px;
+}
+
+.full-art .card-header-overlay {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+}
+
+.card-title {
+    font-family: var(--title-font, 'Merienda'), cursive;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+    letter-spacing: 0.01em;
+    padding: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Polices disponibles uniquement en 400 : évite le faux gras généré par le navigateur */
+.tcg-card[data-title-font="Courgette"] .card-title,
+.tcg-card[data-title-font="Lilita One"] .card-title,
+.tcg-card[data-title-font="Luckiest Guy"] .card-title {
+    font-weight: 400;
+}
+
+/* Luckiest Guy : le dessin des lettres est ~2px plus haut que les autres polices (mesuré),
+   on le redescend sans changer la hauteur de la ligne */
+.tcg-card[data-title-font="Luckiest Guy"] .card-title {
+    padding: 4px 0 0;
+    letter-spacing: 0.04em;
+}
+
+/* Cristal de mana */
+.card-mana {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-mana svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.mana-value {
+    position: relative;
+    font-weight: 900;
+    font-size: 1.35rem;
+    color: #fff;
+    text-shadow: 0 0 2px #000, 0 2px 3px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6);
+}
+
+.card-footer-overlay {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 8px 12px 8px;
+}
+
+.full-art .card-footer-overlay {
+    margin-top: auto;
+    padding-top: 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 70%, transparent 100%);
+}
+
+.card-type-banner {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #cbd5e1;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.card-hp-text {
+    color: #fff;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.card-textbox {
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 80px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* Sorts (ou effets pour les Terrains) */
+.card-spell + .card-spell {
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 5px;
+}
+
+.spell-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.spell-name {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.spell-dmg {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.spell-text {
+    font-size: 0.72rem;
+    color: #cbd5e1;
+    line-height: 1.3;
+    white-space: pre-line;
+}
+
+/* Verso */
+/* Verso plein cadre : l'illustration a déjà son propre cadre */
+.tcg-card.card-back {
+    --frame-w: 0px;
+    --inner-radius: 18px;
+    --line-1: 0 solid transparent;
+    --elem-bg: #3b2410;
+    --frame-bg: #3b2410;
+}
+
+/* background-size plutôt qu'object-fit : html2canvas (exports PNG/TTS) ne gère pas object-fit */
+.card-back-img {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.preview-cards {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.preview-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.preview-caption {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+
+.full-art .card-textbox { background: rgba(15, 23, 42, 0.6); }
+
+.card-ability {
+    font-size: 0.8rem;
+    color: #e2e8f0;
+    line-height: 1.35;
+    font-weight: 500;
+    white-space: pre-line;
+}
+
+.card-flavor {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-style: italic;
+    border-left: 2px solid #64748b;
+    padding-left: 6px;
+    margin-top: 2px;
+}
+
+.card-bottom-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 16px;
+}
+
+.card-meta {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.65rem;
+    color: #cbd5e1;
+    text-shadow: 0 1px 2px #000;
+}
+
+.rarity-gem {
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    background: var(--accent);
+    border: 1px solid rgba(0,0,0,0.7);
+    box-shadow: 0 0 4px var(--accent-glow);
+}
