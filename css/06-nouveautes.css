@@ -101,9 +101,15 @@
     height: 307px;
     position: relative;
     transform-style: preserve-3d;
+    opacity: 0;
     animation:
-        wn-shake 0.55s ease-in-out 0.1s 1,
-        wn-flip 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.65s forwards;
+        wn-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.95s forwards,
+        wn-flip 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.45s forwards;
+}
+
+@keyframes wn-rise {
+    from { opacity: 0; transform: translateY(70px) scale(0.8); }
+    to { opacity: 1; transform: none; }
 }
 
 @keyframes wn-shake {
@@ -116,8 +122,8 @@
 }
 
 @keyframes wn-flip {
-    from { transform: rotateY(0) scale(1); }
-    to { transform: rotateY(180deg) scale(1.08); }
+    from { opacity: 1; transform: rotateY(0) scale(1); }
+    to { opacity: 1; transform: rotateY(180deg) scale(1.08); }
 }
 
 .wn-face {
@@ -155,7 +161,7 @@
     background: radial-gradient(circle, rgba(255, 247, 214, 0.95), rgba(240, 169, 58, 0.5) 40%, transparent 70%);
     opacity: 0;
     pointer-events: none;
-    animation: wn-flash 0.5s ease-out 0.62s 1;
+    animation: wn-flash 0.5s ease-out 1.42s 1;
 }
 
 @keyframes wn-flash {
@@ -163,6 +169,31 @@
     25% { opacity: 1; }
     100% { opacity: 0; }
 }
+
+/* Le sachet « Mise à jour » : il tremble, se déchire, puis tombe */
+.wn-intro-pack {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    width: 200px;
+    height: 324px;
+    margin: -162px 0 0 -100px;
+    animation: wn-shake 0.6s ease-in-out 0.1s 1;
+}
+.wn-intro-pack .booster-pack { position: absolute; inset: 0; box-shadow: 0 0 50px rgba(240, 169, 58, 0.5), 0 20px 40px rgba(0, 0, 0, 0.6); }
+.wn-intro-pack .wn-pack-top {
+    clip-path: polygon(0 0, 100% 0, 100% 13%, 90% 15%, 80% 12.5%, 70% 15%, 60% 12.5%, 50% 15%, 40% 12.5%, 30% 15%, 20% 12.5%, 10% 15%, 0 13%);
+    animation: wn-tear-top 0.75s cubic-bezier(0.3, 0.6, 0.3, 1) 0.7s forwards;
+}
+.wn-intro-pack .wn-pack-body {
+    clip-path: polygon(0 13%, 10% 15%, 20% 12.5%, 30% 15%, 40% 12.5%, 50% 15%, 60% 12.5%, 70% 15%, 80% 12.5%, 90% 15%, 100% 13%, 100% 100%, 0 100%);
+    animation: wn-tear-body 0.7s ease-in 1s forwards;
+}
+.wn-intro-pack .pack-window { color: #fff6dc; }
+
+@keyframes wn-tear-top { to { transform: translate(70%, -150%) rotate(30deg); opacity: 0; } }
+@keyframes wn-tear-body { to { transform: translateY(90%); opacity: 0; } }
 
 /* --- Carrousel --- */
 .wn-panel {
@@ -240,56 +271,122 @@
     perspective: 800px;
 }
 
-/* Slide 1 : mini-carte qui oscille toute seule en 3D, avec reflet holo */
-.wn-card-spin {
-    transform-style: preserve-3d;
-    animation: wn-sway 4s ease-in-out infinite;
+/* Slide « Interface » : barre d'onglets dont l'onglet actif défile, et une fenêtre maison */
+.wn-ui-demo { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.wn-ui-tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.3rem;
+    border-radius: 999px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-color);
+}
+.wn-ui-tabs span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    animation: wn-tab 7.5s ease-in-out infinite;
+}
+.wn-ui-tabs span:nth-child(2) { animation-delay: 1.5s; }
+.wn-ui-tabs span:nth-child(3) { animation-delay: 3s; }
+.wn-ui-tabs span:nth-child(4) { animation-delay: 4.5s; }
+.wn-ui-tabs span:nth-child(5) { animation-delay: 6s; }
+.wn-ui-tabs svg { width: 14px; height: 14px; }
+@keyframes wn-tab {
+    0%, 22% { background: rgba(240, 169, 58, 0.18); color: var(--amber-light); box-shadow: inset 0 0 0 1px rgba(240, 169, 58, 0.5); }
+    26%, 100% { background: transparent; color: var(--text-muted); box-shadow: none; }
+}
+.wn-ui-dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--wood-light);
+    background: linear-gradient(160deg, rgba(240, 169, 58, 0.1), transparent 50%), var(--bg-raised);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    animation: wn-dialog 5s ease-in-out infinite;
+}
+.wn-ui-dialog strong { display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-display); color: var(--text-main); }
+.wn-ui-dialog strong svg { width: 18px; height: 18px; color: var(--amber); }
+.wn-ui-buttons { display: flex; gap: 0.4rem; justify-content: flex-end; }
+.wn-ui-buttons b { padding: 0.25rem 0.7rem; border-radius: 7px; font-size: 0.75rem; background: var(--bg-deep); color: var(--text-soft); border: 1px solid var(--border-color); }
+.wn-ui-buttons b.ok { background: linear-gradient(180deg, var(--copper-light), var(--copper)); color: #1d1009; border-color: #7a3f14; }
+@keyframes wn-dialog {
+    0%, 8% { opacity: 0; transform: translateY(12px) scale(0.92); }
+    16%, 80% { opacity: 1; transform: none; }
+    90%, 100% { opacity: 0; transform: translateY(-6px) scale(0.97); }
 }
 
-.wn-card-spin { --glare: 1; --gx: 50%; --gy: 35%; }
-.wn-card-spin .holo3d { --holo: 0.45; }
-.wn-card-spin .holo3d { animation: wn-holo-move 4s ease-in-out infinite; }
-.wn-card-spin .glare3d { animation: wn-glare-move 4s ease-in-out infinite; }
+/* Slide « Sets » : le symbole s'allume d'une rareté à l'autre, la progression se remplit */
+.wn-sets { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; }
+.wn-set-symbols { display: flex; gap: 0.7rem; }
+.wn-set-symbols span {
+    display: inline-flex;
+    padding: 0.5rem;
+    border-radius: 12px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-color);
+    animation: wn-symbol 0.5s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 0.18s + 0.2s) backwards;
+}
+.wn-set-symbols span:nth-child(4) { box-shadow: 0 0 14px rgba(201, 160, 255, 0.45); }
+.wn-set-symbols span:nth-child(5) {
+    box-shadow: 0 0 18px rgba(255, 214, 120, 0.6);
+    animation: wn-symbol 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.92s backwards, wn-glow 2s ease-in-out 1.4s infinite;
+}
+@keyframes wn-symbol { from { opacity: 0; transform: translateY(16px) scale(0.6); } }
+@keyframes wn-glow { 50% { box-shadow: 0 0 28px rgba(255, 214, 120, 0.9); } }
+.wn-set-chip { display: flex; align-items: center; gap: 0.5rem; font-variant-numeric: tabular-nums; color: var(--text-soft); font-weight: 700; }
+.wn-set-chip b { padding: 0.1rem 0.5rem; border-radius: 6px; background: rgba(240, 169, 58, 0.15); color: var(--amber-light); letter-spacing: 0.08em; font-size: 0.8rem; }
+.wn-set-progress { width: 200px; height: 7px; border-radius: 999px; background: var(--bg-deep); overflow: hidden; }
+.wn-set-progress div { height: 100%; width: 14%; border-radius: inherit; background: linear-gradient(90deg, var(--copper), var(--amber)); animation: wn-progress 4s ease-in-out infinite; }
+@keyframes wn-progress { 0%, 10% { width: 6%; } 70%, 100% { width: 64%; } }
 
-@keyframes wn-sway {
-    0%, 100% { transform: rotateY(-22deg) rotateX(8deg); }
-    50% { transform: rotateY(22deg) rotateX(-6deg); }
+/* Slide « Filtres » : la même carte, filtre après filtre (cycle de 10 s) */
+.wn-filters { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.wn-filter-cards { position: relative; }
+.wn-filter-cards .mini-card { position: absolute; inset: 0; animation: wn-cycle 10s linear calc(var(--i) * 2s) infinite both; }
+.wn-filter-labels { position: relative; height: 1.5rem; width: 160px; }
+.wn-filter-labels span {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--amber-light);
+    animation: wn-cycle 10s linear calc(var(--i) * 2s) infinite both;
+}
+@keyframes wn-cycle {
+    0% { opacity: 0; }
+    4%, 18% { opacity: 1; }
+    22%, 100% { opacity: 0; }
 }
 
-@keyframes wn-holo-move {
-    0%, 100% { background-position: 0% 30%; }
-    50% { background-position: 100% 70%; }
+/* Slide « Boosters » : trois cartes s'échappent du sachet, la dernière brille */
+.wn-booster { position: relative; width: 200px; height: 170px; display: flex; align-items: flex-end; justify-content: center; }
+.wn-booster-pack { position: relative; z-index: 2; animation: wn-pack-wobble 3s ease-in-out infinite; }
+.wn-fan { position: absolute !important; left: calc(50% - 37.5px); bottom: 40px; z-index: 1; border-radius: 6px; animation: wn-fan 3s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.wn-fan-0 { --r: -24deg; --x: -58px; }
+.wn-fan-1 { --r: 0deg; --x: 0px; animation-delay: 0.12s; }
+.wn-fan-2 { --r: 24deg; --x: 58px; animation-delay: 0.24s; box-shadow: 0 0 22px 4px rgba(255, 214, 120, 0.75); }
+@keyframes wn-fan {
+    0%, 12% { transform: translate(0, 60px) rotate(0); opacity: 0; }
+    35%, 80% { transform: translate(var(--x), -14px) rotate(var(--r)); opacity: 1; }
+    100% { transform: translate(0, 60px) rotate(0); opacity: 0; }
+}
+@keyframes wn-pack-wobble {
+    0%, 100% { transform: rotate(0); }
+    8% { transform: rotate(-5deg); }
+    16% { transform: rotate(4deg); }
+    24% { transform: rotate(0); }
 }
 
-@keyframes wn-glare-move {
-    0%, 100% { background-position: -40px 0; }
-    50% { background-position: 40px 0; }
-}
-
-/* Slides 2 et 3 : grandes icônes animées */
-.wn-emoji span { font-size: 4.5rem; display: inline-block; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5)); }
-.wn-lock { animation: wn-bounce 2s ease-in-out infinite; }
-.wn-copy { animation: wn-bounce 2s ease-in-out 0.4s infinite; }
-.wn-swords { animation: wn-clash 1.4s ease-in-out infinite; }
-.wn-dice { animation: wn-roll 2.2s ease-in-out infinite; }
-
-@keyframes wn-bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-14px); }
-}
-
-@keyframes wn-clash {
-    0%, 100% { transform: scale(1) rotate(0); }
-    40% { transform: scale(1.18) rotate(-8deg); }
-    55% { transform: scale(0.95) rotate(4deg); }
-}
-
-@keyframes wn-roll {
-    0%, 100% { transform: rotate(0) translateY(0); }
-    50% { transform: rotate(360deg) translateY(-12px); }
-}
-
-/* Slide 4 : téléphone avec l'icône de l'app */
+/* Dernière slide : téléphone avec l'icône de l'app */
 .wn-phone {
     width: 120px;
     height: 190px;
@@ -349,6 +446,13 @@
 
 @media (max-width: 767px) {
     .wn-visual { height: 160px; }
+    .wn-ui-tabs span { padding: 0.35rem 0.45rem; font-size: 0; gap: 0; }
+    .wn-ui-tabs svg { width: 18px; height: 18px; }
+    .wn-set-symbols { gap: 0.4rem; }
+    .wn-set-symbols svg { width: 30px; height: 30px; }
+    .wn-booster { transform: scale(0.85); }
+    .wn-phone { width: 96px; height: 148px; border-radius: 18px; }
+    .wn-phone img { width: 56px; height: 56px; border-radius: 13px; }
     .wn-slide { padding: 0.6rem 1rem; }
     .wn-slide h2 { font-size: 1.15rem; }
     .wn-slide p { font-size: 0.88rem; }

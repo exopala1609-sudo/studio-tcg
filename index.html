@@ -649,8 +649,9 @@
         <div class="wn-bubbles" id="wnBubbles"></div>
         <button type="button" class="wn-skip" onclick="closeWhatsNew()">Passer<i data-lucide="x"></i></button>
 
-        <!-- Intro : la carte de dos tremble, flashe et se retourne -->
+        <!-- Intro : un booster « Mise à jour » se déchire, la carte de version en sort et se retourne -->
         <div class="wn-intro" id="wnIntro">
+            <div class="wn-intro-pack" id="wnIntroPack"></div>
             <div class="wn-intro-card" id="wnIntroCard">
                 <div class="wn-face wn-face-back" id="wnIntroBack"></div>
                 <div class="wn-face wn-face-front">
@@ -669,25 +670,52 @@
             </div>
             <div class="wn-track" id="wnTrack">
                 <section class="wn-slide">
-                    <div class="wn-visual"><div class="wn-card-spin" id="wnCardSpin"></div></div>
-                    <h2 id="wnTitle">Nouveau cockpit &amp; cartes 3D</h2>
-                    <p>L'éditeur passe en <strong>3 colonnes</strong> : tout se règle sans défiler. Basculez en <strong>Inspection 3D</strong> pour incliner votre carte, admirer son reflet holographique et la <strong>retourner</strong> d'un clic.</p>
+                    <div class="wn-visual">
+                        <div class="wn-ui-demo">
+                            <div class="wn-ui-tabs">
+                                <span><i data-lucide="palette"></i>Studio</span>
+                                <span><i data-lucide="library"></i>Collection</span>
+                                <span><i data-lucide="package-open"></i>Boosters</span>
+                                <span><i data-lucide="layers"></i>Decks</span>
+                                <span><i data-lucide="swords"></i>Arène</span>
+                            </div>
+                            <div class="wn-ui-dialog">
+                                <strong><i data-lucide="beer"></i>Une dernière tournée ?</strong>
+                                <span class="wn-ui-buttons"><b>Non merci</b><b class="ok">Santé !</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 id="wnTitle">La Taverne fait peau neuve</h2>
+                    <p>Une identité <strong>bois, cuivre et ambre</strong>, des icônes nettes et une navigation en onglets. Les alertes du navigateur laissent place à des <strong>fenêtres maison</strong>, et sur Android le bouton <strong>Retour</strong> ferme simplement ce qui est ouvert.</p>
                 </section>
                 <section class="wn-slide">
-                    <div class="wn-visual wn-icons">
-                        <span class="wn-lock"><i data-lucide="lock"></i></span>
-                        <span class="wn-copy"><i data-lucide="copy"></i></span>
+                    <div class="wn-visual">
+                        <div class="wn-sets">
+                            <div class="wn-set-symbols" id="wnSetSymbols"></div>
+                            <div class="wn-set-chip"><b>TAV</b><span>007 / 050</span></div>
+                            <div class="wn-set-progress"><div></div></div>
+                        </div>
                     </div>
-                    <h2>Vos cartes sont protégées</h2>
-                    <p>Chacun reste <strong>propriétaire de ses cartes</strong> : personne ne peut les modifier ou les supprimer à votre place. Ouvrir la carte d'un ami et l'enregistrer crée simplement <strong>une copie à votre nom</strong>.</p>
+                    <h2>Des sets à part entière</h2>
+                    <p>Créez vos extensions avec un <strong>nom, un code et un symbole</strong> qui prend la couleur de la rareté sur la carte. La <strong>numérotation est automatique</strong>, les doublons sont signalés et la progression de chaque set se suit dans le classeur.</p>
                 </section>
                 <section class="wn-slide">
-                    <div class="wn-visual wn-icons">
-                        <span class="wn-swords"><i data-lucide="swords"></i></span>
-                        <span class="wn-dice"><i data-lucide="dices"></i></span>
+                    <div class="wn-visual">
+                        <div class="wn-filters">
+                            <div class="wn-filter-cards" id="wnFilterCards"></div>
+                            <div class="wn-filter-labels" id="wnFilterLabels"></div>
+                        </div>
                     </div>
-                    <h2>Arène &amp; decks en direct</h2>
-                    <p>Rejoignez un <strong>salon de combat multijoueur</strong> avec un code partagé : piochez, posez vos cartes, lancez vos sorts et suivez tout en temps réel. Composez vos <strong>decks</strong>, synchronisés entre PC et téléphone.</p>
+                    <h2>Filtres photo</h2>
+                    <p>Donnez un style commun à vos illustrations : <strong>Taverne, Ambre, Gravure, Parchemin, Nuit, Vif</strong>, avec intensité, luminosité, contraste et saturation. Un set peut imposer son filtre, les <strong>exports PNG et Tabletop</strong> le gardent, et la photo d'origine n'est jamais modifiée.</p>
+                </section>
+                <section class="wn-slide">
+                    <div class="wn-visual">
+                        <div class="wn-booster" id="wnBooster"></div>
+                    </div>
+                    <h2>Ouvrez des boosters</h2>
+                    <p>Composez des boosters à partir de la collection, avec vos propres <strong>taux de rareté</strong>. Déchirez le sachet, retournez les cartes une à une… et espérez la légendaire. Chaque carte obtenue rejoint votre <strong>inventaire</strong>.</p>
+                    <button type="button" class="btn btn-secondary btn-small" onclick="whatsNewGoTo('boosters')"><i data-lucide="package-open"></i>Voir les boosters</button>
                 </section>
                 <section class="wn-slide">
                     <div class="wn-visual">
@@ -696,8 +724,8 @@
                             <span>TCGBP</span>
                         </div>
                     </div>
-                    <h2>Application Android</h2>
-                    <p>Installez <strong>TCGBP sur votre écran d'accueil</strong> : l'app s'ouvre en plein écran, comme une vraie application, et reçoit chaque mise à jour automatiquement.</p>
+                    <h2>Toujours dans votre poche</h2>
+                    <p>Installez <strong>TCGBP sur votre écran d'accueil</strong> : l'app s'ouvre en plein écran et reçoit chaque mise à jour automatiquement, comme celle-ci.</p>
                     <button type="button" class="btn btn-install" id="wnInstallBtn" onclick="installFromWhatsNew()" hidden><i data-lucide="smartphone"></i>Installer maintenant</button>
                     <p class="wn-hint" id="wnInstallHint">Sur Android : menu de Chrome, puis « Installer l'application ».</p>
                 </section>

@@ -2,7 +2,7 @@
 // on demande toujours la dernière version au réseau (donc chaque mise à jour poussée
 // sur GitHub arrive tout de suite), et on ne sert le cache qu'en secours, hors ligne.
 
-const CACHE = 'studio-tcgbp-v10';
+const CACHE = 'studio-tcgbp-v11';
 
 // Fichiers de l'app, mis en cache dès l'installation pour un premier lancement hors ligne
 const APP_FILES = [

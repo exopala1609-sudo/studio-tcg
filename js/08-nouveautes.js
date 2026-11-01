@@ -4,9 +4,100 @@
 //  QUOI DE NEUF : animation d'accueil, une fois par version et par joueur
 //  (mémorisé dans le profil Supabase + localStorage, donc PC et téléphone)
 // =====================================================================
-const WN_INTRO_MS = 1200;
+const WN_INTRO_MS = 2100;
+const WN_FILTERS = ['none', 'taverne', 'ambre', 'gravure', 'nuit'];
 let wnIndex = 0;
 let wnTimer = null;
+
+// Illustration de démonstration quand la carte en cours n'a pas encore de photo :
+// un coucher de soleil sur les collines, avec une chope au premier plan
+function wnDemoArt() {
+    const c = document.createElement('canvas');
+    c.width = 480;
+    c.height = 340;
+    const x = c.getContext('2d');
+    const sky = x.createLinearGradient(0, 0, 0, 340);
+    sky.addColorStop(0, '#3d6fa8');
+    sky.addColorStop(0.55, '#f2a65a');
+    sky.addColorStop(1, '#f7d48a');
+    x.fillStyle = sky;
+    x.fillRect(0, 0, 480, 340);
+    x.fillStyle = '#fff2c4';
+    x.beginPath();
+    x.arc(330, 170, 46, 0, Math.PI * 2);
+    x.fill();
+    x.fillStyle = '#4f7a2c';
+    x.beginPath();
+    x.moveTo(0, 260);
+    x.quadraticCurveTo(140, 190, 270, 250);
+    x.quadraticCurveTo(380, 300, 480, 230);
+    x.lineTo(480, 340);
+    x.lineTo(0, 340);
+    x.fill();
+    x.fillStyle = '#7a4a22';
+    x.fillRect(90, 190, 74, 100);
+    x.strokeStyle = '#7a4a22';
+    x.lineWidth = 12;
+    x.beginPath();
+    x.arc(166, 238, 24, -Math.PI / 2, Math.PI / 2);
+    x.stroke();
+    x.fillStyle = '#fbf3e0';
+    x.beginPath();
+    x.ellipse(127, 190, 46, 18, 0, 0, Math.PI * 2);
+    x.fill();
+    return c.toDataURL('image/jpeg', 0.85);
+}
+
+function buildWhatsNewVisuals() {
+    // Intro : un sachet « Mise à jour », en deux morceaux pour la déchirure
+    const update = { name: `Mise à jour ${APP_VERSION}`, color: 'ambre', slots: DEFAULT_SLOTS, cardIds: [] };
+    const introPack = document.getElementById('wnIntroPack');
+    introPack.innerHTML = '';
+    ['wn-pack-body', 'wn-pack-top'].forEach(cls => {
+        const pack = makePackVisual(update, 200);
+        pack.classList.add(cls);
+        pack.querySelector('.pack-window').innerHTML = icon('sparkles', 46);
+        pack.querySelector('.pack-count').textContent = `${document.querySelectorAll('#wnTrack .wn-slide').length} nouveautés`;
+        introPack.appendChild(pack);
+    });
+
+    // Sets : le même symbole, teinté de la commune à la légendaire
+    document.getElementById('wnSetSymbols').innerHTML = RARITY_ORDER
+        .map((r, i) => `<span style="--i:${i}" title="${RARITIES[r]}">${setSymbolSvg('beer', r, 40)}</span>`).join('');
+
+    // Filtres : la carte en cours (ou une illustration de démo) passe d'un filtre à l'autre
+    const base = readForm({ preview: true });
+    if (!base.imageSrc) base.imageSrc = wnDemoArt();
+    const scale = isMobileLayout() ? 0.24 : 0.3;   // carte + nom du filtre tiennent dans la zone visuelle
+    const cards = document.getElementById('wnFilterCards');
+    cards.style.width = `${375 * scale}px`;
+    cards.style.height = `${523 * scale}px`;
+    cards.replaceChildren(...WN_FILTERS.map((preset, i) => {
+        const mini = makeMiniCard({ ...base, photoFilter: { ...DEFAULT_FILTER, preset } }, scale);
+        mini.style.setProperty('--i', i);
+        return mini;
+    }));
+    document.getElementById('wnFilterLabels').innerHTML = WN_FILTERS
+        .map((p, i) => `<span style="--i:${i}">${p === 'none' ? 'Photo d\'origine' : FILTER_PRESETS[p].label}</span>`).join('');
+
+    // Boosters : un sachet d'où s'échappent trois cartes, la dernière en or
+    const booster = document.getElementById('wnBooster');
+    const fans = [0, 1, 2].map(i => {
+        const back = makeBackMini(0.2);
+        back.className += ` wn-fan wn-fan-${i}`;
+        return back;
+    });
+    const pack = makePackVisual({ name: 'Cuvée des Fondateurs', color: 'cuivre', slots: DEFAULT_SLOTS, cardIds: [] }, 92);
+    pack.querySelector('.pack-window').innerHTML = icon('beer', 30);
+    pack.classList.add('wn-booster-pack');
+    booster.replaceChildren(...fans, pack);
+}
+
+// Bouton d'une slide : ferme l'animation puis ouvre la vue concernée
+function whatsNewGoTo(view) {
+    closeWhatsNew();
+    setMainView(view);
+}
 
 function hasSeenWhatsNew() {
     let local = null;
@@ -41,10 +132,9 @@ function showWhatsNewModal() {
         bubbles.appendChild(b);
     }
 
-    // Slide 1 : la carte en cours d'édition, qui oscille en 3D avec reflet holo
-    document.getElementById('wnCardSpin').replaceChildren(withShine(makeMiniCard(readForm({ preview: true }), 0.42)));
+    buildWhatsNewVisuals();
 
-    // Slide 4 : bouton d'installation direct si Android le propose
+    // Dernière slide : bouton d'installation direct si Android le propose
     document.getElementById('wnInstallBtn').hidden = !installPromptEvent;
     document.getElementById('wnInstallHint').hidden = !!installPromptEvent;
 
@@ -65,10 +155,11 @@ function showWhatsNewModal() {
     intro.hidden = reduced;
     panel.hidden = !reduced;
     // Relance les animations CSS de l'intro à chaque ouverture
-    const card = document.getElementById('wnIntroCard');
-    card.style.animation = 'none';
-    void card.offsetWidth;
-    card.style.animation = '';
+    intro.querySelectorAll('.wn-intro-card, .wn-intro-pack, .wn-intro-pack .booster-pack, .wn-flash').forEach(el => {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+    });
 
     overlay.classList.remove('closing');
     overlay.hidden = false;

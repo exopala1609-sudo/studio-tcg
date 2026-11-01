@@ -1,7 +1,7 @@
 // Configuration : version de l'app, connexion Supabase, pastille d'état
 
 // Version affichée dans « Quoi de neuf » : l'augmenter relance l'animation chez chaque joueur
-const APP_VERSION = '2.0';
+const APP_VERSION = '3.0';
 
 // ---------- Supabase ----------
 // Clé "publishable" : faite pour être visible dans la page. Les données sont protégées
