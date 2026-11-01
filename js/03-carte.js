@@ -34,6 +34,7 @@ function normalizeCard(c) {
         element: c.element || c.theme || 'neutral',
         subtype: c.subtype ?? '',
         titleFont: c.titleFont || 'Merienda',
+        setId: c.setId || null,
         setName: c.setName ?? '',
         hp: c.hp ?? '',
         spells: [0, 1].map(i => {
@@ -72,7 +73,6 @@ const DEMO_TEXT = {
     spell2Name: 'Coup de queue',
     spell2Dmg: '30',
     cardFlavorInput: 'Il régna sur les pics incandescents durant des millénaires.',
-    cardSetNameInput: 'Édition de base',
     cardArtistInput: 'Studio TCG'
 };
 const TEXT_FIELDS = [...Object.keys(DEMO_TEXT), 'spell2Text'];
@@ -112,6 +112,7 @@ function readForm({ preview = false } = {}) {
         element: v('elementInput'),
         subtype: v('cardSubtypeInput'),
         titleFont: v('titleFontInput'),
+        setId: (sets.find(s => s.id === raw('cardSetSelect').value) || {}).id || null,
         setName: v('cardSetNameInput'),
         hp: v('cardHpInput'),
         spells: [1, 2].map(i => ({ name: v(`spell${i}Name`), dmg: v(`spell${i}Dmg`), text: v(`spell${i}Text`) })),
@@ -184,9 +185,18 @@ function applyCardData(cardEl, d) {
     flavor.textContent = d.flavor;
     flavor.style.display = d.flavor ? '' : 'none';
 
-    const numbering = (d.cardNum || d.totalSet) ? `${d.cardNum}/${d.totalSet}` : '';
-    const meta = [d.artist, [d.setName, numbering].filter(Boolean).join(' ')].filter(Boolean).join(' • ');
+    // Set : code + numéro, et symbole teinté par la rareté (à la place de la gemme)
+    const set = findSetForCard(d);
+    const total = set && set.total ? padNum(set.total) : d.totalSet;
+    const numbering = d.cardNum ? `${d.cardNum}${total ? '/' + total : ''}` : '';
+    const meta = [d.artist, [set ? set.code : d.setName, numbering].filter(Boolean).join(' ')].filter(Boolean).join(' • ');
     q('.card-meta-text').textContent = meta;
+    const symbol = q('.set-symbol');
+    if (symbol) {
+        symbol.hidden = !set;
+        symbol.innerHTML = set ? setSymbolSvg(set.symbol, d.rarity) : '';
+        q('.rarity-gem').hidden = !!set;
+    }
 
     cardEl.style.setProperty('--title-font', `'${d.titleFont || 'Merienda'}'`);
     cardEl.dataset.titleFont = d.titleFont || 'Merienda';
@@ -248,6 +258,7 @@ function makeMiniCard(d, scale) {
 function updateCard() {
     const d = readForm({ preview: true });
     applyCardData(document.getElementById('renderCard'), d);
+    refreshSetHints();
     schedule3d();
 
     document.getElementById('zoomVal').textContent = d.zoom;

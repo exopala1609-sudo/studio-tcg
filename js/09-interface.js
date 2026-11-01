@@ -206,8 +206,9 @@ function renderCollection() {
 
     const visible = collection.filter(c =>
         (!typeFilter || c.type === typeFilter) &&
+        matchesSetFilter(c) &&
         (!ownerTab || (ownerTab === 'mine' ? isOwnCard(c) : c.ownerId === ownerTab)) &&
-        (!search || `${c.name} ${c.subtype} ${c.ability} ${c.setName || ''} ${c.ownerName || ''}`.toLowerCase().includes(search))
+        (!search || `${c.name} ${c.subtype} ${c.ability} ${c.setName || ''} ${findSetForCard(c)?.code || ''} ${c.ownerName || ''}`.toLowerCase().includes(search))
     );
 
     if (visible.length === 0) {

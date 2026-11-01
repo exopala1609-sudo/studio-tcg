@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="css/08-refonte.css">
     <link rel="stylesheet" href="css/09-impression.css">
     <link rel="stylesheet" href="css/10-taverne.css">
+    <link rel="stylesheet" href="css/11-sets.css">
 </head>
 <body data-mtab="card" data-view="creator">
 
@@ -262,6 +263,7 @@
                             <div class="card-bottom-info">
                                 <div class="card-meta">
                                     <span class="rarity-gem"></span>
+                                    <span class="set-symbol" hidden></span>
                                     <span class="card-meta-text"></span>
                                 </div>
                             </div>
@@ -366,21 +368,31 @@
 
             <!-- Set & Artiste -->
             <div class="section-group">
-                <h3>Set & illustrateur</h3>
+                <h3>Set & illustrateur <span class="help-tip" tabindex="0" data-tip="Choisissez un set : la carte reçoit automatiquement le prochain numéro libre, et le symbole du set s'affiche en bas de la carte, teinté selon la rareté.">?</span></h3>
                 <div class="form-group">
-                    <label>Nom du set</label>
-                    <input type="text" id="cardSetNameInput" value="" placeholder="Édition de base" oninput="updateCard()">
+                    <label for="cardSetSelect">Set</label>
+                    <div class="set-picker">
+                        <select id="cardSetSelect" onchange="onCardSetChange()"></select>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="openSetList()"><i data-lucide="library"></i>Sets</button>
+                    </div>
+                    <input type="hidden" id="cardSetNameInput" value="">
+                    <p class="warn-line" id="legacySetHint" hidden><i data-lucide="info"></i><span></span>
+                        <button type="button" class="link-btn" onclick="openSetEditor(null, { assignToCard: true, presetName: document.getElementById('cardSetNameInput').value })">Le créer</button></p>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>N° de carte</label>
-                        <input type="text" id="cardNumInput" value="001" oninput="updateCard()">
+                        <label for="cardNumInput">N° de carte</label>
+                        <div class="num-picker">
+                            <input type="text" id="cardNumInput" value="001" oninput="updateCard()">
+                            <button type="button" class="btn btn-secondary btn-icon" onclick="autoNumber()" title="Prochain numéro libre du set" aria-label="Prochain numéro libre du set"><i data-lucide="wand-sparkles"></i></button>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Total du set</label>
+                        <label for="cardTotalSetInput">Total du set</label>
                         <input type="text" id="cardTotalSetInput" value="050" oninput="updateCard()">
                     </div>
                 </div>
+                <p class="warn-line" id="numConflictHint" hidden><i data-lucide="circle-alert"></i><span></span></p>
                 <div class="form-group">
                     <label>Nom de l'artiste</label>
                     <input type="text" id="cardArtistInput" value="" placeholder="Studio TCG" oninput="updateCard()">
@@ -621,6 +633,7 @@
                 </div>
                 <div class="collection-filters">
                     <input type="search" id="collectionSearch" placeholder="Rechercher…" oninput="renderCollection()">
+                    <select id="collectionSetFilter" onchange="renderCollection()"></select>
                     <select id="collectionTypeFilter" onchange="renderCollection()">
                         <option value="">Tous les types</option>
                         <option value="hero">Héros</option>
@@ -628,6 +641,7 @@
                         <option value="artifact">Artefact</option>
                         <option value="land">Terrain</option>
                     </select>
+                    <button class="btn btn-secondary btn-small" onclick="openSetList()"><i data-lucide="library"></i>Sets</button>
                     <button class="btn btn-secondary btn-small" onclick="clearCollection()"><i data-lucide="trash-2"></i>Vider</button>
                 </div>
             </div>
@@ -667,6 +681,62 @@
                 <button class="btn" type="submit" id="authSubmit">Se connecter</button>
             </form>
             <button type="button" class="link-btn" onclick="continueOffline()">Continuer hors ligne (cartes enregistrées dans ce navigateur)</button>
+        </div>
+    </div>
+
+    <!-- MODALE : LISTE DES SETS -->
+    <div class="modal-overlay" id="setListModal" onclick="if (event.target === this) closeModal('setListModal')">
+        <div class="modal-content wide">
+            <div class="modal-toolbar">
+                <button class="btn btn-back btn-small" onclick="closeModal('setListModal')"><i data-lucide="arrow-left"></i>Retour</button>
+                <h2>Sets du groupe</h2>
+                <button class="btn btn-small toolbar-end" onclick="openSetEditor(null)"><i data-lucide="plus"></i>Nouveau set</button>
+            </div>
+            <div class="set-list" id="setList"></div>
+        </div>
+    </div>
+
+    <!-- MODALE : CRÉER / MODIFIER UN SET -->
+    <div class="modal-overlay" id="setEditorModal" onclick="if (event.target === this) closeModal('setEditorModal')">
+        <div class="modal-content set-editor">
+            <div class="modal-toolbar">
+                <button class="btn btn-back btn-small" onclick="closeModal('setEditorModal')"><i data-lucide="arrow-left"></i>Retour</button>
+                <h2 id="setEditorTitle">Nouveau set</h2>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="setNameInput">Nom du set</label>
+                    <input type="text" id="setNameInput" maxlength="40" placeholder="Édition de base" oninput="onSetNameInput()">
+                </div>
+                <div class="form-group">
+                    <label for="setCodeInput">Code (2 à 4 caractères)</label>
+                    <input type="text" id="setCodeInput" maxlength="4" placeholder="EDB" oninput="onSetCodeInput(this)">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="setTotalInput">Nombre de cartes prévu</label>
+                    <input type="number" id="setTotalInput" min="1" max="999" value="50">
+                </div>
+                <div class="form-group">
+                    <label>Selon la rareté</label>
+                    <div class="symbol-preview" id="setSymbolPreview"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Symbole</label>
+                <div class="symbol-grid" id="setSymbolGrid"></div>
+            </div>
+            <div class="form-group">
+                <label for="setDescInput">Description (optionnel)</label>
+                <textarea id="setDescInput" maxlength="300" placeholder="Le premier set de la taverne."></textarea>
+            </div>
+            <div class="set-editor-actions">
+                <button type="button" class="btn btn-danger btn-small" id="setDeleteBtn" onclick="deleteSetFromEditor()" hidden><i data-lucide="trash-2"></i>Supprimer</button>
+                <span class="spacer"></span>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('setEditorModal')">Annuler</button>
+                <button type="button" class="btn" onclick="saveSetFromEditor()"><i data-lucide="save"></i>Enregistrer</button>
+            </div>
         </div>
     </div>
 
@@ -715,5 +785,6 @@
     <script src="js/09-interface.js"></script>
     <script src="js/10-exports.js"></script>
     <script src="js/11-dialogues.js"></script>
+    <script src="js/12-sets.js"></script>
 </body>
 </html>

@@ -1,0 +1,127 @@
+/* Sets : choix dans le Studio, symbole sur la carte, liste et édition des sets */
+
+/* ---------- Carte : symbole du set (à la place de la gemme de rareté) ---------- */
+.card-meta .set-symbol { display: inline-flex; align-items: center; }
+.card-meta .set-symbol svg { width: 13px; height: 13px; }
+
+/* ---------- Studio ---------- */
+.set-picker, .num-picker { display: flex; gap: 0.4rem; }
+.set-picker select { flex: 1; min-width: 0; }
+.num-picker input { flex: 1; min-width: 0; }
+#cardTotalSetInput[readonly] { opacity: 0.65; cursor: not-allowed; }
+
+.warn-line .link-btn { margin-left: 0.3rem; color: var(--amber-light); font-size: 0.8rem; }
+
+/* ---------- Liste des sets ---------- */
+.modal-toolbar .toolbar-end { margin-left: auto; }
+
+.set-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.set-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: linear-gradient(160deg, rgba(240, 169, 58, 0.06), transparent 45%), var(--bg-raised);
+}
+
+.set-item-symbol {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-deep);
+    border: 1px solid var(--wood-light);
+}
+
+.set-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.set-item-info h3 { display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-size: 1.1rem; }
+
+.set-code {
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 0.1rem 0.45rem;
+    border-radius: 6px;
+    background: rgba(240, 169, 58, 0.15);
+    color: var(--amber-light);
+}
+
+.set-owner, .set-stats { color: var(--text-muted); font-size: 0.82rem; }
+.set-desc { color: var(--text-soft); font-size: 0.88rem; }
+.set-desc:empty, .set-owner:empty { display: none; }
+
+.set-progress {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--bg-deep);
+    overflow: hidden;
+    margin-top: 0.2rem;
+}
+
+.set-progress > div {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--copper), var(--amber));
+}
+
+.set-item-actions { display: flex; flex-direction: column; gap: 0.35rem; flex-shrink: 0; }
+
+.set-orphans {
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: 1px dashed var(--wood-light);
+}
+
+.set-orphans h4 { font-size: 0.85rem; color: var(--amber-light); margin-bottom: 0.5rem; }
+.set-orphan { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.3rem 0; font-size: 0.88rem; }
+
+/* ---------- Édition d'un set ---------- */
+.set-editor { max-width: 560px; }
+
+.symbol-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    gap: 0.4rem;
+}
+
+.symbol-btn {
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.symbol-btn:hover { border-color: var(--wood-light); }
+.symbol-btn.selected { border-color: var(--amber); box-shadow: inset 0 0 0 1px var(--amber); background: rgba(240, 169, 58, 0.1); }
+
+.symbol-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 38px;
+    padding: 0 0.6rem;
+    border-radius: 6px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-color);
+}
+
+.symbol-preview span { display: inline-flex; }
+
+.set-editor-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.set-editor-actions .spacer { flex: 1; }
+
+@media (max-width: 767px) {
+    .set-item { flex-wrap: wrap; }
+    .set-item-actions { flex-direction: row; flex-wrap: wrap; width: 100%; }
+}

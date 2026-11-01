@@ -47,6 +47,7 @@ async function reloadCollection() {
     }
     setCurrentCard(currentCardId);
     updateMigrationButton();
+    refreshSetUI();
 }
 
 function clearLoadedCollection() {

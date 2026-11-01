@@ -304,6 +304,7 @@ function loadCardIntoForm(rawCard, keepId = true) {
     set('cardSubtypeInput', card.subtype);
     set('titleFontInput', card.titleFont);
     set('cardSetNameInput', card.setName);
+    set('cardSetSelect', findSetForCard(card)?.id || '');
     set('cardHpInput', card.hp);
     card.spells.forEach((s, i) => {
         set(`spell${i + 1}Name`, s.name);
@@ -319,6 +320,7 @@ function loadCardIntoForm(rawCard, keepId = true) {
     set('artHeightRange', card.artHeight || ART_HEIGHT_AUTO);
     set('cardNumInput', card.cardNum);
     set('cardTotalSetInput', card.totalSet);
+    syncSetFields();
     set('cardArtistInput', card.artist);
     currentImageSrc = card.imageSrc;
     setCurrentCard(keepId ? rawCard.id : null);
@@ -365,6 +367,8 @@ async function resetToNewCard() {
     set('artHeightRange', ART_HEIGHT_AUTO);
     currentImageSrc = '';
     setCurrentCard(null);
+    const currentSet = selectedSet();
+    set('cardNumInput', currentSet ? padNum(nextFreeNumber(currentSet)) : '001');
     updateCard();
     document.getElementById('cardNameInput').focus();
 }
