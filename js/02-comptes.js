@@ -47,12 +47,17 @@ function applySession(session) {
     collectionOwnerKey = ownerKey;
     if (loggedIn) {
         // On écoute d'abord, puis on charge : aucun changement ne peut passer entre les deux
-        setTimeout(() => { startRealtime(); loadSharedBack(); reloadSets(); reloadCollection(); maybeShowWhatsNew(); }, 0);
+        setTimeout(() => { startRealtime(); loadSharedBack(); reloadSets(); reloadCollection().then(reloadBoosters); maybeShowWhatsNew(); }, 0);
     } else {
         stopRealtime();
         stopSetsRealtime();
+        stopBoostersRealtime();
         if (typeof gameChannel !== 'undefined' && gameChannel) leaveTable();
-        if (!offlineMode) clearLoadedCollection();
+        if (!offlineMode) {
+            clearLoadedCollection();
+            boosters = [];
+            myOpenings = [];
+        }
     }
 }
 
@@ -108,7 +113,7 @@ function continueOffline() {
     document.getElementById('authOverlay').hidden = true;
     setCloudStatus('Hors ligne', 'offline');
     reloadSets();
-    reloadCollection();
+    reloadCollection().then(reloadBoosters);
     maybeShowWhatsNew();
 }
 

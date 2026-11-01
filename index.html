@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="css/10-taverne.css">
     <link rel="stylesheet" href="css/11-sets.css">
     <link rel="stylesheet" href="css/12-filtres.css">
+    <link rel="stylesheet" href="css/13-boosters.css">
 </head>
 <body data-mtab="card" data-view="creator">
 
@@ -45,6 +46,7 @@
         <nav class="main-tabs" aria-label="Vues principales">
             <button type="button" data-view="creator" class="active" onclick="setMainView('creator')"><i data-lucide="palette"></i><span>Studio</span></button>
             <button type="button" data-view="collection" onclick="setMainView('collection')"><i data-lucide="library"></i><span>Collection</span><span class="tab-count" id="headerCollectionCount">0</span></button>
+            <button type="button" data-view="boosters" onclick="setMainView('boosters')"><i data-lucide="package-open"></i><span>Boosters</span></button>
             <button type="button" data-view="decks" onclick="setMainView('decks')"><i data-lucide="layers"></i><span>Decks</span></button>
             <button type="button" data-view="arena" onclick="setMainView('arena')"><i data-lucide="swords"></i><span>Arène</span></button>
         </nav>
@@ -425,6 +427,74 @@
         </div>
     </main>
 
+    <!-- BOOSTERS -->
+    <section class="boosters-view" id="boostersView">
+        <div class="boosters-list-view" id="boostersListView">
+            <div class="view-head">
+                <div>
+                    <h2>Boosters</h2>
+                    <p class="view-sub" id="boostersNote"></p>
+                </div>
+                <button class="btn" id="boosterCreateBtn" onclick="openBoosterEditor()"><i data-lucide="plus"></i>Créer un booster</button>
+            </div>
+            <div class="inventory-summary" id="inventorySummary"></div>
+            <div class="booster-grid" id="boosterGrid"></div>
+            <h3 class="section-title" id="openingHistoryTitle" hidden>Mes derniers tirages</h3>
+            <div class="opening-history" id="openingHistory"></div>
+        </div>
+
+        <div class="booster-editor" id="boosterEditor" hidden>
+            <div class="view-head deck-editor-head">
+                <button class="btn btn-back" onclick="closeBoosterEditor()"><i data-lucide="arrow-left"></i>Retour aux boosters</button>
+                <input type="text" id="boosterNameInput" placeholder="Nom du booster" maxlength="40" oninput="markBoosterDirty(); refreshBoosterPreview()">
+                <button class="btn btn-danger" id="boosterDeleteBtn" onclick="deleteBoosterFromEditor()"><i data-lucide="trash-2"></i>Supprimer</button>
+                <button class="btn btn-success" onclick="saveBoosterFromEditor()"><i data-lucide="save"></i>Enregistrer</button>
+            </div>
+            <div class="booster-editor-body">
+                <div class="deck-pool">
+                    <div class="pool-head">
+                        <h3>Cartes possibles <span class="pool-help">— touchez une carte pour l'inclure ou la retirer</span></h3>
+                        <div class="pool-filters">
+                            <input type="search" id="boosterSearchInput" placeholder="Filtrer…" oninput="renderBoosterPool()">
+                            <select id="boosterSetFilter" onchange="renderBoosterPool()"></select>
+                            <select id="boosterRarityFilter" onchange="renderBoosterPool()">
+                                <option value="">Toutes raretés</option>
+                                <option value="common">Commune</option>
+                                <option value="uncommon">Peu commune</option>
+                                <option value="rare">Rare</option>
+                                <option value="epic">Épique</option>
+                                <option value="legendary">Légendaire</option>
+                            </select>
+                            <button type="button" class="btn btn-secondary btn-small" onclick="selectFilteredBoosterCards(true)"><i data-lucide="check-check"></i>Tout inclure</button>
+                            <button type="button" class="btn btn-secondary btn-small" onclick="selectFilteredBoosterCards(false)"><i data-lucide="x"></i>Tout retirer</button>
+                        </div>
+                    </div>
+                    <div class="pool-grid" id="boosterPool"></div>
+                </div>
+                <div class="booster-settings">
+                    <div class="booster-look">
+                        <div id="boosterPreview"></div>
+                        <div class="form-group">
+                            <label>Couleur du sachet</label>
+                            <div class="color-chips" id="boosterColorChips"></div>
+                            <label for="boosterLimitInput">Ouvertures par jour et par joueur <span class="help-tip" tabindex="0" data-tip="0 = illimité. Le compteur repart à minuit.">?</span></label>
+                            <input type="number" id="boosterLimitInput" min="0" max="50" value="3" oninput="markBoosterDirty()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Contenu d'un booster <span class="help-tip" tabindex="0" data-tip="Chaque emplacement tire ses cartes selon ses pourcentages de rareté (total 100 %). Si une rareté manque dans la sélection, son taux passe à la rareté la plus proche.">?</span></label>
+                        <div class="slot-list" id="boosterSlots"></div>
+                        <div class="slot-tools">
+                            <button type="button" class="btn btn-secondary btn-small" onclick="addBoosterSlot()"><i data-lucide="plus"></i>Ajouter un emplacement</button>
+                            <button type="button" class="link-btn" onclick="resetBoosterSlots()">Rétablir le modèle (3 C, 1 PC, 1 rare ou mieux)</button>
+                        </div>
+                    </div>
+                    <div class="booster-summary" id="boosterSummary"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- DECKS -->
     <section class="decks-view" id="decksView">
         <div class="decks-list-view" id="decksListView">
@@ -643,9 +713,19 @@
     <nav class="bottom-tabs" id="bottomTabs" aria-label="Navigation">
         <button type="button" data-tab="creator" class="active" onclick="setMainView('creator')"><i data-lucide="palette"></i><span>Studio</span></button>
         <button type="button" data-tab="collection" onclick="setMainView('collection')"><i data-lucide="library"></i><span>Collection</span><b class="tab-badge" id="tabCollectionCount">0</b></button>
+        <button type="button" data-tab="boosters" onclick="setMainView('boosters')"><i data-lucide="package-open"></i><span>Boosters</span></button>
         <button type="button" data-tab="decks" onclick="setMainView('decks')"><i data-lucide="layers"></i><span>Decks</span></button>
         <button type="button" data-tab="arena" onclick="setMainView('arena')"><i data-lucide="swords"></i><span>Arène</span></button>
     </nav>
+
+    <!-- OUVERTURE D'UN BOOSTER (plein écran) -->
+    <div class="pack-opening" id="packOpening" hidden>
+        <div class="po-glow"></div>
+        <button type="button" class="po-close" onclick="closePackOpening()" aria-label="Fermer"><i data-lucide="x"></i></button>
+        <div class="po-stage" id="poStage"></div>
+        <p class="po-hint" id="poHint"></p>
+        <div class="po-actions" id="poActions"></div>
+    </div>
 
     <!-- CLASSEUR DE COLLECTION (plein écran) -->
     <div class="binder-overlay" id="binderOverlay" hidden onclick="if (event.target === this) closeBinder()">
@@ -658,6 +738,11 @@
                 <div class="collection-filters">
                     <input type="search" id="collectionSearch" placeholder="Rechercher…" oninput="renderCollection()">
                     <select id="collectionSetFilter" onchange="renderCollection()"></select>
+                    <select id="collectionOwnedFilter" onchange="renderCollection()" aria-label="Inventaire">
+                        <option value="">Toutes les cartes</option>
+                        <option value="owned">Mon inventaire</option>
+                        <option value="missing">Manquantes</option>
+                    </select>
                     <select id="collectionTypeFilter" onchange="renderCollection()">
                         <option value="">Tous les types</option>
                         <option value="hero">Héros</option>
@@ -823,5 +908,6 @@
     <script src="js/11-dialogues.js"></script>
     <script src="js/12-sets.js"></script>
     <script src="js/13-filtres.js"></script>
+    <script src="js/14-boosters.js"></script>
 </body>
 </html>

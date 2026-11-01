@@ -204,9 +204,11 @@ function renderCollection() {
     renderOwnerTabs();
     grid.innerHTML = '';
 
+    const owned = ownedCounts();
     const visible = collection.filter(c =>
         (!typeFilter || c.type === typeFilter) &&
         matchesSetFilter(c) &&
+        matchesOwnedFilter(c, owned) &&
         (!ownerTab || (ownerTab === 'mine' ? isOwnCard(c) : c.ownerId === ownerTab)) &&
         (!search || `${c.name} ${c.subtype} ${c.ability} ${c.setName || ''} ${findSetForCard(c)?.code || ''} ${c.ownerName || ''}`.toLowerCase().includes(search))
     );
@@ -231,6 +233,13 @@ function renderCollection() {
         }
 
         item.appendChild(makeMiniCard(card, isMobileLayout() ? 0.36 : 0.45));
+        if (owned.has(card.id)) {
+            const copies = document.createElement('span');
+            copies.className = 'owned-badge';
+            copies.title = 'Exemplaires dans votre inventaire';
+            copies.textContent = `×${owned.get(card.id)}`;
+            item.appendChild(copies);
+        }
 
         const title = document.createElement('div');
         title.className = 'collection-title';

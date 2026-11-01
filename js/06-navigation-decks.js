@@ -23,6 +23,7 @@ function applyView(view) {
         if (game) renderBoard();
     }
     if (view === 'decks') renderDecksView();
+    if (view === 'boosters' && !boosterEditorState) renderBoostersView();
     refreshNavHighlight();
 }
 
