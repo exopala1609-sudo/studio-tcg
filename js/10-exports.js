@@ -80,6 +80,7 @@ function importDeck(event) {
 async function downloadCardImage() {
     const d = readForm({ preview: true });
     await getImageRatio(d.imageSrc || DEFAULT_ART);
+    await prepareCardImage(d);
     await downloadClone(makeCardClone(d), d.name || 'carte_tcg');
 }
 
@@ -146,6 +147,7 @@ async function exportTabletopZip() {
         for (let i = 0; i < cards.length; i++) {
             btn.textContent = `Carte ${i + 1}/${cards.length}…`;
             await getImageRatio(cards[i].imageSrc || DEFAULT_ART);
+            await prepareCardImage(cards[i]);
             const canvas = await renderOffscreen(makeCardClone(cards[i]), SCALE);
             canvases.push(canvas);
             zip.file(`cartes/${String(i + 1).padStart(3, '0')}_${slugify(cards[i].name)}.png`, await canvasToBlob(canvas));

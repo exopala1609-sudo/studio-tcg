@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="css/09-impression.css">
     <link rel="stylesheet" href="css/10-taverne.css">
     <link rel="stylesheet" href="css/11-sets.css">
+    <link rel="stylesheet" href="css/12-filtres.css">
 </head>
 <body data-mtab="card" data-view="creator">
 
@@ -115,6 +116,29 @@
                 <div class="form-group" id="artHeightGroup">
                     <label>Hauteur zone image (<span id="artHeightVal">Auto</span>)</label>
                     <input type="range" id="artHeightRange" min="120" max="330" step="5" value="120" oninput="updateCard()">
+                </div>
+                <div class="form-group filter-group">
+                    <label>Filtre photo <span class="help-tip" tabindex="0" data-tip="Le filtre est calculé sur l'image : il apparaît aussi dans les exports PNG et Tabletop. La photo d'origine n'est jamais modifiée, vous pouvez changer d'avis à tout moment.">?</span></label>
+                    <div class="filter-grid" id="filterPresetGrid"></div>
+                    <div class="filter-advanced" id="filterAdvanced" hidden>
+                        <div class="filter-slider">
+                            <label for="filter_strength">Intensité <span id="filter_strength_val">100</span></label>
+                            <input type="range" id="filter_strength" min="0" max="100" value="100" oninput="onFilterSlider('strength', this)">
+                        </div>
+                        <div class="filter-slider">
+                            <label for="filter_brightness">Luminosité <span id="filter_brightness_val">0</span></label>
+                            <input type="range" id="filter_brightness" min="-50" max="50" value="0" oninput="onFilterSlider('brightness', this)">
+                        </div>
+                        <div class="filter-slider">
+                            <label for="filter_contrast">Contraste <span id="filter_contrast_val">0</span></label>
+                            <input type="range" id="filter_contrast" min="-50" max="50" value="0" oninput="onFilterSlider('contrast', this)">
+                        </div>
+                        <div class="filter-slider">
+                            <label for="filter_saturation">Saturation <span id="filter_saturation_val">0</span></label>
+                            <input type="range" id="filter_saturation" min="-100" max="100" value="0" oninput="onFilterSlider('saturation', this)">
+                        </div>
+                        <button type="button" class="link-btn" onclick="resetFilterAdjustments()">Réinitialiser les réglages</button>
+                    </div>
                 </div>
                 <p class="warn-line" id="textOverflowHint" style="display:none;"><i data-lucide="circle-alert"></i>Le texte de la carte est coupé : réduisez la hauteur de la zone image.</p>
                 <div class="form-row">
@@ -728,6 +752,18 @@
                 <div class="symbol-grid" id="setSymbolGrid"></div>
             </div>
             <div class="form-group">
+                <label for="setFilterSelect">Filtre photo par défaut <span class="help-tip" tabindex="0" data-tip="Appliqué à toutes les cartes du set qui n'ont pas leur propre filtre : un style commun, même avec des photos très différentes.">?</span></label>
+                <select id="setFilterSelect">
+                    <option value="none">Aucun</option>
+                    <option value="taverne">Taverne</option>
+                    <option value="ambre">Ambre</option>
+                    <option value="gravure">Gravure</option>
+                    <option value="parchemin">Parchemin</option>
+                    <option value="nuit">Nuit</option>
+                    <option value="vif">Vif</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="setDescInput">Description (optionnel)</label>
                 <textarea id="setDescInput" maxlength="300" placeholder="Le premier set de la taverne."></textarea>
             </div>
@@ -786,5 +822,6 @@
     <script src="js/10-exports.js"></script>
     <script src="js/11-dialogues.js"></script>
     <script src="js/12-sets.js"></script>
+    <script src="js/13-filtres.js"></script>
 </body>
 </html>

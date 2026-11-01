@@ -143,6 +143,7 @@ window.addEventListener('DOMContentLoaded', () => {
     init3dTilt();
     document.getElementById('demoTextCheck').checked = demoTextEnabled;
     if (window.lucide) lucide.createIcons();
+    renderFilterPanel();
     updateCardZoom();
     initPwa();
     updateCard();

@@ -28,12 +28,13 @@ function rowToSet(row) {
         name: row.name,
         symbol: row.data?.symbol || 'star',
         total: Number(row.data?.total) || 0,
-        description: row.data?.description || ''
+        description: row.data?.description || '',
+        filter: row.data?.filter || 'none'
     };
 }
 
 function setToRow(set) {
-    return { code: set.code, name: set.name, data: { symbol: set.symbol, total: set.total, description: set.description } };
+    return { code: set.code, name: set.name, data: { symbol: set.symbol, total: set.total, description: set.description, filter: set.filter || 'none' } };
 }
 
 function readLocalSets() {
@@ -184,6 +185,7 @@ function onCardSetChange() {
     // Numéro attribué automatiquement s'il est vide ou déjà pris dans ce set
     const num = parseInt(document.getElementById('cardNumInput').value, 10);
     if (set && (!Number.isFinite(num) || usedNumbers(set, currentCardId).has(num))) autoNumber();
+    renderFilterPanel();
     updateCard();
 }
 
@@ -225,6 +227,7 @@ function openSetEditor(setId, { assignToCard = false, presetName = '' } = {}) {
     if (set) codeInput.dataset.touched = '1'; else delete codeInput.dataset.touched;
     document.getElementById('setTotalInput').value = set?.total || 50;
     document.getElementById('setDescInput').value = set?.description || '';
+    document.getElementById('setFilterSelect').value = set?.filter || 'none';
     document.getElementById('setDeleteBtn').hidden = !set;
     renderSymbolGrid();
     openModal('setEditorModal');
@@ -275,7 +278,7 @@ async function saveSetFromEditor() {
     if (sets.some(s => s.code.toUpperCase() === code && s.id !== setEditorState.id)) return toast(`Le code ${code} est déjà utilisé par un autre set.`, { tone: 'warning' });
     if (!Number.isFinite(total) || total < 1 || total > 999) return toast('Le nombre de cartes prévu doit être entre 1 et 999.', { tone: 'warning' });
 
-    const set = { code, name, total, symbol: setEditorState.symbol, description: document.getElementById('setDescInput').value.trim() };
+    const set = { code, name, total, symbol: setEditorState.symbol, description: document.getElementById('setDescInput').value.trim(), filter: document.getElementById('setFilterSelect').value };
     let savedId = setEditorState.id;
     if (isCloudActive()) {
         const query = savedId
@@ -430,6 +433,7 @@ function matchesSetFilter(card) {
 
 function refreshSetUI() {
     renderSetSelect();
+    renderFilterPanel();
     renderCollectionSetFilter();
     updateCard();
     if (document.getElementById('setListModal').style.display === 'flex') renderSetList();

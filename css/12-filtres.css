@@ -1,0 +1,73 @@
+/* Filtres photo : aperçus miniatures et réglages fins */
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+    gap: 0.45rem;
+}
+
+.filter-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.3rem;
+    border-radius: 9px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-deep);
+    color: var(--text-soft);
+    cursor: pointer;
+    min-width: 0;
+}
+
+.filter-chip:hover { border-color: var(--wood-light); }
+
+.filter-chip.selected {
+    border-color: var(--amber);
+    box-shadow: inset 0 0 0 1px var(--amber);
+    color: var(--amber-light);
+}
+
+.filter-thumb {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: #3a2a1d center / cover no-repeat;
+}
+
+.filter-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* Sans photo : une pastille de couleur représentative de chaque filtre */
+.filter-thumb.thumb-none { background: linear-gradient(135deg, #5b7fa6, #c9785a); }
+.filter-thumb.thumb-taverne { background: linear-gradient(135deg, #5a3a1c, #c9955c); }
+.filter-thumb.thumb-ambre { background: linear-gradient(135deg, #201008, #a0521e 55%, #f7cd80); }
+.filter-thumb.thumb-gravure { background: linear-gradient(135deg, #111, #eee); }
+.filter-thumb.thumb-parchemin { background: linear-gradient(135deg, #8a7a62, #e4d3b1); }
+.filter-thumb.thumb-nuit { background: linear-gradient(135deg, #0f1726, #4b6a8f); }
+.filter-thumb.thumb-vif { background: linear-gradient(135deg, #e0443a, #f2c230 50%, #2fb6a0); }
+
+.filter-advanced {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0.65rem 0.7rem;
+    margin-top: 0.4rem;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--border-color);
+}
+
+.filter-slider { display: flex; flex-direction: column; gap: 0.15rem; }
+.filter-slider label { display: flex; justify-content: space-between; font-size: 0.78rem; }
+.filter-slider label span { color: var(--amber-light); font-weight: 700; font-variant-numeric: tabular-nums; }
+.filter-slider input:disabled { opacity: 0.4; }
+
+.filter-advanced .link-btn { align-self: flex-start; color: var(--amber-light); font-size: 0.78rem; padding: 0; }

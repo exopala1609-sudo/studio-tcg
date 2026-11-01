@@ -122,6 +122,7 @@ function handleImageUpload(event) {
 function loadImageFile(file) {
     readImageFile(file, async src => {
         currentImageSrc = await uploadIfCloud(src, currentUser?.id);
+        renderFilterPanel();
         resetArtPosition();
     });
 }
@@ -323,6 +324,8 @@ function loadCardIntoForm(rawCard, keepId = true) {
     syncSetFields();
     set('cardArtistInput', card.artist);
     currentImageSrc = card.imageSrc;
+    currentFilter = normalizeFilter(card.photoFilter);
+    renderFilterPanel();
     setCurrentCard(keepId ? rawCard.id : null);
     updateCard();
 }
@@ -366,6 +369,8 @@ async function resetToNewCard() {
     set('offsetYRange', 0);
     set('artHeightRange', ART_HEIGHT_AUTO);
     currentImageSrc = '';
+    currentFilter = null;
+    renderFilterPanel();
     setCurrentCard(null);
     const currentSet = selectedSet();
     set('cardNumInput', currentSet ? padNum(nextFreeNumber(currentSet)) : '001');

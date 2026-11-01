@@ -35,6 +35,7 @@ function normalizeCard(c) {
         subtype: c.subtype ?? '',
         titleFont: c.titleFont || 'Merienda',
         setId: c.setId || null,
+        photoFilter: normalizeFilter(c.photoFilter),
         setName: c.setName ?? '',
         hp: c.hp ?? '',
         spells: [0, 1].map(i => {
@@ -127,6 +128,7 @@ function readForm({ preview = false } = {}) {
         cardNum: v('cardNumInput'),
         totalSet: v('cardTotalSetInput'),
         artist: v('cardArtistInput'),
+        photoFilter: normalizeFilter(currentFilter),
         imageSrc: currentImageSrc
     };
 }
@@ -203,14 +205,23 @@ function applyCardData(cardEl, d) {
 
     const img = q('.card-art-img');
     const src = d.imageSrc || DEFAULT_ART;
-    if (img.dataset.src !== src) {
-        img.dataset.src = src;
-        img.style.backgroundImage = `url("${src}")`;
+    img.dataset.orig = src;
+    // Filtre photo : image traitée (mise en cache) ; l'originale s'affiche le temps du calcul
+    const filter = d.imageSrc ? effectiveFilter(d) : null;
+    const key = filter ? filterKey(d.imageSrc, filter) : '';
+    const shown = (filter && filteredCache.get(key)) || src;
+    img.dataset.filterKey = key;
+    if (filter && !filteredCache.has(key)) {
+        requestFiltered(d.imageSrc, filter).then(() => { if (img.dataset.filterKey === key) applyCardData(cardEl, d); });
+    }
+    if (img.dataset.src !== shown) {
+        img.dataset.src = shown;
+        img.style.backgroundImage = `url("${shown}")`;
     }
     // Proportions réelles de l'image ; si encore inconnues, on les mesure puis on ré-applique
     const ratio = imageRatioCache.get(src);
     img.style.setProperty('--img-ratio', ratio || 1);
-    if (!ratio) getImageRatio(src).then(() => { if (img.dataset.src === src) applyCardData(cardEl, d); });
+    if (!ratio) getImageRatio(src).then(() => { if (img.dataset.orig === src) applyCardData(cardEl, d); });
     // -50 % = centrage dans la fenêtre, puis décalage choisi (en % de la taille de l'image)
     img.style.transform = `translate(${(d.offsetX || 0) - 50}%, ${(d.offsetY || 0) - 50}%) scale(${(d.zoom || 100) / 100})`;
 }
